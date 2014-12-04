@@ -18,20 +18,22 @@ ping(conn)
 mySQLquery = ['SELECT 	smart_home.timestamp'...
     ' ,	smart_home.b7139_01_r_01_phase1'... 
     ' FROM 	energydata.smart_home '...
-    ' WHERE 	smart_home.timestamp = 1417628969'];
-
+    ' WHERE 	smart_home.timestamp >= 1417735228'...
+    ' ORDER BY 	smart_home.timestamp DESC'];
+tic;
 curs = exec(conn,mySQLquery);
+t = toc;
 %Fetch data based on cursor used above
-curs = fetch(curs);
+curs = fetch(curs,200);
 
 %Store data locally on Matlab
-shData = curs.Data;
+shData1 = curs.Data;
 
 %Close cursor
 close(curs);
 
 %Close database connection.
-close(conn);
+% close(conn);
 
 %Clear variables
 clear conn curs
