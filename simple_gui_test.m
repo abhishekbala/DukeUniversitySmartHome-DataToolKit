@@ -1,13 +1,15 @@
 function simple_gui_test
+%% Initialize Data:
+myData = load('phaseData.mat');
+
+%% Main Code
 % Select a data set from the pop-up menu, then
 % click the toggle button. Clicking the button
 % plots the selected data in the axes.
 
 %  Create and then hide the GUI as it is being constructed.
 f = figure('Visible','off','Position',[270,1000,900,570]);
-a=[linspace(0,2*pi,200)' sin(linspace(0,2*pi,200)')];
-b=[linspace(0,2*pi,200)' linspace(1,200,200)'];
-current_data = a;
+current_data = [myData(:,1)];
 
 %  Construct the components.
 hstart = uicontrol('Style','togglebutton','String','Start',...
@@ -18,7 +20,7 @@ htext = uicontrol('Style','text','String','Select Data',...
     'Position',[650,380,120,30]);
 
 hpopup = uicontrol('Style','popupmenu',...
-    'String',{'sin','line'},...
+    'String',{'Total Power Phase A','Total Power Phase B'},...
     'Position',[600,300,200,50],...
     'Callback',{@popup_menu_Callback});
 ha = axes('Units','Pixels','Position',[100,120,400,370]);
@@ -43,11 +45,11 @@ set(f,'Visible','on');
         val = get(source,'Value');
         % Set current data to the selected data set.
         switch str{val};
-            case 'sin' % User selects Peaks.
-                current_data = a;
+            case 'Total Power Phase A' % User selects Peaks.
+                current_data = myData(:,1);
                 
-            case 'line' % User selects Membrane.
-                current_data = b;
+            case 'Total Power Phase B' % User selects Membrane.
+                current_data = myData(:,2);
         end
     end
 
