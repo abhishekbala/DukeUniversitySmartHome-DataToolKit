@@ -4,24 +4,25 @@ function simple_gui_test
 % plots the selected data in the axes.
 
 %  Create and then hide the GUI as it is being constructed.
-f = figure('Visible','off','Position',[360,500,450,285]);
+f = figure('Visible','off','Position',[270,1000,900,570]);
 a=[linspace(0,2*pi,200)' sin(linspace(0,2*pi,200)')];
 b=[linspace(0,2*pi,200)' linspace(1,200,200)'];
 current_data = a;
 
 %  Construct the components.
 hstart = uicontrol('Style','togglebutton','String','Start',...
-    'Position',[315,180,70,25],...
+    'Position',[630,460,140,50],...
     'Callback',{@start_Callback});
 
 htext = uicontrol('Style','text','String','Select Data',...
-    'Position',[325,90,60,15]);
+    'Position',[650,380,120,30]);
 
 hpopup = uicontrol('Style','popupmenu',...
     'String',{'sin','line'},...
-    'Position',[300,50,100,25],...
+    'Position',[600,300,200,50],...
     'Callback',{@popup_menu_Callback});
-ha = axes('Units','Pixels','Position',[50,60,200,185]);
+ha = axes('Units','Pixels','Position',[100,120,400,370]);
+hb = axes('Units', 'Pixels', 'Position', [600, 100, 200, 185]);
 align([hstart,htext,hpopup],'Center','None');
 
 % Initialize the GUI.
@@ -58,7 +59,12 @@ set(f,'Visible','on');
             set(hObject,'String','Streaming');
         else set(hObject,'String','Start');
         end
-        while get(hObject,'Value')
+        
+            axes(hb);
+            pie(1:10);
+        while get(hObject,'Value')            
+            axes(ha)
+            plot(current_data(:,1),current_data(:,2));
             current_data(:,2)=circshift(current_data(:,2),[1,0]);
             set(mplot(1),'YData',current_data(:,2));
             pause(0.01)
