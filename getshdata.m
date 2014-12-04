@@ -20,14 +20,15 @@ mySQLquery = ['SELECT 	smart_home.timestamp'...
     ' FROM 	energydata.smart_home '...
     ' WHERE 	smart_home.timestamp >= 1417735228'...
     ' ORDER BY 	smart_home.timestamp DESC'];
-tic;
+%tic;
 curs = exec(conn,mySQLquery);
-t = toc;
+%t = toc;
+
 %Fetch data based on cursor used above
 curs = fetch(curs,200);
 
 %Store data locally on Matlab
-shData1 = curs.Data;
+shData = curs.Data;
 
 %Close cursor
 close(curs);
