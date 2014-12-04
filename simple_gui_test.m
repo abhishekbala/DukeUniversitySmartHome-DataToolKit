@@ -2,7 +2,6 @@ function simple_gui_test
 % Select a data set from the pop-up menu, then
 % click the toggle button. Clicking the button
 % plots the selected data in the axes.
-% testing testing Raghav
 
 %  Create and then hide the GUI as it is being constructed.
 f = figure('Visible','off','Position',[270,1000,900,570]);
@@ -54,7 +53,9 @@ set(f,'Visible','on');
 
 % Push button callbacks. Each callback plots current_data in
 % the specified plot type.
-    mplot(1) = plot(current_data(:,1),current_data(:,2));
+    
+    axes(hb);
+    pie(1);
     function start_Callback(hObject,eventdata,handles)
         if get(hObject,'Value')
             set(hObject,'String','Streaming');
@@ -63,14 +64,16 @@ set(f,'Visible','on');
         
             axes(hb);
             pie(1:10);
-        while get(hObject,'Value')            
-            axes(ha)
-            plot(current_data(:,1),current_data(:,2));
-            current_data(:,2)=circshift(current_data(:,2),[1,0]);
-            set(mplot(1),'YData',current_data(:,2));
-            pause(0.01)
-            drawnow
             
-        end        
+            axes(ha);
+            %plot(1:10);
+            mplot(1) = plot(current_data(:,1), current_data(:,2));
+            while(get(hObject, 'Value'))
+                current_data(:,2) = circshift(current_data(:,2), [1,0]);
+                set(mplot(1), 'YData', current_data(:,2));
+                pause(0.01);
+                drawnow;
+            end
+
     end
 end
