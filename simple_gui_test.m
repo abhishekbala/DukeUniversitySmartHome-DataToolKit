@@ -1,6 +1,9 @@
 function simple_gui_test
 %% Initialize Data:
-myData = load('phaseData.mat');
+clear; clc;
+load('phaseData.mat', 'r' );
+load('fridgedata.mat', 'fridgedata');
+myData = [r fridgedata];
 
 %% Main Code
 % Select a data set from the pop-up menu, then
@@ -9,7 +12,7 @@ myData = load('phaseData.mat');
 
 %  Create and then hide the GUI as it is being constructed.
 f = figure('Visible','off','Position',[270,1000,900,570]);
-current_data = [myData(:,1)];
+current_data = [myData(:,3)];
 
 %  Construct the components.
 hstart = uicontrol('Style','togglebutton','String','Start',...
@@ -20,7 +23,7 @@ htext = uicontrol('Style','text','String','Select Data',...
     'Position',[650,380,120,30]);
 
 hpopup = uicontrol('Style','popupmenu',...
-    'String',{'Total Power Phase A','Total Power Phase B'},...
+    'String',{'Refrigerator Power', 'Total Power Phase A','Total Power Phase B'},...
     'Position',[600,300,200,50],...
     'Callback',{@popup_menu_Callback});
 ha = axes('Units','Pixels','Position',[100,120,400,370]);
@@ -45,6 +48,8 @@ set(f,'Visible','on');
         val = get(source,'Value');
         % Set current data to the selected data set.
         switch str{val};
+            case 'Refrigerator Power'
+                current_data = myData(:,3);
             case 'Total Power Phase A' % User selects Peaks.
                 current_data = myData(:,1);
                 
@@ -68,12 +73,16 @@ set(f,'Visible','on');
             pie(1:10);
             
             axes(ha);
-            %plot(1:10);
-            mplot(1) = plot(current_data(:,1), current_data(:,2));
+            latest_data = current_data(1:200);
+            mplot(1) = plot(latest_data);
             while(get(hObject, 'Value'))
-                current_data(:,2) = circshift(current_data(:,2), [1,0]);
-                set(mplot(1), 'YData', current_data(:,2));
-                pause(0.01);
+                current_data = circshift(current_data, [1,0]);
+                latest_data = current_data(1:200);
+                %latest_data = circshift(lastest_data, [1, 0]);
+                %latest_data(1) = current_data(numel(current_data));
+                set(mplot(1), 'YData', latest_data);
+                axis([0, 200, 0 , 3000]);
+                pause(1);
                 drawnow;
             end
 
