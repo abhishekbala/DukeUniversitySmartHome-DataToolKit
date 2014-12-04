@@ -1,3 +1,5 @@
+% Bass Connections in Energy Team
+
 function SmartHome_PowerDataStream
 % Select a data set from the pop-up menu, then
 % click the 'Start' toggle button. Clicking the button
