@@ -1,3 +1,4 @@
+tic;
 %The data format preferences.
 setdbprefs('DataReturnFormat', 'numeric');
 setdbprefs('NullNumberRead', 'NaN');
@@ -18,11 +19,16 @@ ping(conn)
 mySQLquery = ['SELECT 	smart_home.timestamp'...
     ' ,	smart_home.b7139_01_r_01_phase1'... 
     ' FROM 	energydata.smart_home '...
-    ' WHERE 	smart_home.timestamp = 1417628969'];
+    ' ,	smart_home.b7139_01_r_03_solar1'...
+    ' ,	smart_home.b7139_01_r_04_solar2'...
+%    ' ,	smart_home.b7139_03_r_01_refrig'...
+%    ' ,	smart_home.b7139_06_r_01_irrigation'...
+    ' WHERE 	smart_home.timestamp >= 1417628969'...
+    ' ORDER BY 	smart_home.timestamp DESC '];
 
 curs = exec(conn,mySQLquery);
 %Fetch data based on cursor used above
-curs = fetch(curs);
+curs = fetch(curs,10);
 
 %Store data locally on Matlab
 shData = curs.Data;
@@ -35,3 +41,4 @@ close(conn);
 
 %Clear variables
 clear conn curs
+t = toc;
