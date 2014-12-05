@@ -1,9 +1,5 @@
-function simple_gui_test
+function live_stream_gui_test
 %% Initialize Data:
-clear; clc;
-load('phaseData.mat', 'r' );
-load('fridgedata.mat', 'fridgedata');
-myData = [r fridgedata];
 
 %% Main Code
 % Select a data set from the pop-up menu, then
@@ -11,8 +7,11 @@ myData = [r fridgedata];
 % plots the selected data in the axes.
 
 %  Create and then hide the GUI as it is being constructed.
+
+columnChoice = 2;
 f = figure('Visible','off','Position',[270,1000,900,570]);
-current_data = [myData(:,3)];
+%current_data = [myData(:,1)];
+shdata = zeros(200,2);
 
 %  Construct the components.
 hstart = uicontrol('Style','togglebutton','String','Start',...
@@ -23,11 +22,11 @@ htext = uicontrol('Style','text','String','Select Data',...
     'Position',[650,380,120,30]);
 
 hpopup = uicontrol('Style','popupmenu',...
-    'String',{'Refrigerator Power', 'Total Power Phase A','Total Power Phase B'},...
+    'String',{'Total Power Phase A','Total Power Phase B'},...
     'Position',[600,300,200,50],...
     'Callback',{@popup_menu_Callback});
 ha = axes('Units','Pixels','Position',[100,120,400,370]);
-hb = axes('Units', 'Pixels', 'Position', [600, 100, 200, 185]);
+%hb = axes('Units', 'Pixels', 'Position', [600, 100, 200, 185]);
 align([hstart,htext,hpopup],'Center','None');
 
 % Initialize the GUI.
@@ -40,6 +39,7 @@ set(f,'Name','Test GUI')
 movegui(f,'center')
 % Make the GUI visible.
 set(f,'Visible','on');
+[conn, mySQLquery] = setupDatabaseConnection;
 
 
     function popup_menu_Callback(source,eventdata)
@@ -48,43 +48,46 @@ set(f,'Visible','on');
         val = get(source,'Value');
         % Set current data to the selected data set.
         switch str{val};
-            case 'Refrigerator Power'
-                current_data = myData(:,3);
             case 'Total Power Phase A' % User selects Peaks.
-                current_data = myData(:,1);
-                
+                columnChoice = 2;
             case 'Total Power Phase B' % User selects Membrane.
-                current_data = myData(:,2);
+                columnChoice = 3;
         end
     end
 
 % Push button callbacks. Each callback plots current_data in
 % the specified plot type.
     
-    axes(hb);
-    pie(1);
     function start_Callback(hObject,eventdata,handles)
         if get(hObject,'Value')
             set(hObject,'String','Streaming');
         else set(hObject,'String','Start');
         end
         
-            axes(hb);
-            pie(1:10);
-            
+            a1 = annotation('textbox', [.800, .500, .200, .050],...
+                'String', 'Maximum Power: ');
+            a2 = annotation('textbox', [.800, .600, .200, .050],...
+                'String', 'Average Power: ');
+        
             axes(ha);
-            latest_data = current_data(1:200);
-            mplot(1) = plot(latest_data);
+            mplot(1) = plot((1:200)', shdata(:,columnChoice));
             while(get(hObject, 'Value'))
-                current_data = circshift(current_data, [1,0]);
-                latest_data = current_data(1:200);
-                %latest_data = circshift(lastest_data, [1, 0]);
-                %latest_data(1) = current_data(numel(current_data));
-                set(mplot(1), 'YData', latest_data);
-                axis([0, 200, 0 , 3000]);
-                pause(1);
+                shdata = getshdata(conn, mySQLquery);
+                set(mplot(1), 'YData', shdata(:,columnChoice));
+                pause(0.01);
                 drawnow;
+                
+                maxPower = max(shdata(:,columnChoice));
+                maxPowerString = ['Maximum Power: ' num2str(maxPower)];
+                averagePower = mean(shdata(:,columnChoice));
+                averagePowerString = ['Average Power: ' num2str(averagePower)];
+                
+                delete(a1);
+                delete(a2);
+                a1 = annotation('textbox', [.600, .100, .200, .050],...
+                'String', maxPowerString);
+                a2 = annotation('textbox', [.600, .200, .200, .050],...
+                'String', averagePowerString);
             end
-
     end
 end
