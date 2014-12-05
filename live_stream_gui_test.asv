@@ -9,7 +9,7 @@ function live_stream_gui_test
 %  Create and then hide the GUI as it is being constructed.
 
 columnChoice = 2;
-colorValues = [0 0 1];
+colorValues = [0 1 0];
 f = figure('Visible','off','Position',[270,1000,900,570]);
 shdata = zeros(200,2);
 
@@ -65,11 +65,9 @@ set(f,'Visible','on');
         end
         
             a1 = annotation('textbox', [.675, .400, .200, .050],...
-                'String', 'Maximum Power: ', 'Color', colorValues, ...
-                'FontWeight', 'bold');
+                'String', 'Maximum Power: ');
             a2 = annotation('textbox', [.675, .300, .200, .050],...
-                'String', 'Average Power: ', 'Color', colorValues, ...
-                'FontWeight', 'bold');
+                'String', 'Average Power: ');
         
             axes(ha);
             mplot(1) = plot((1:200)', shdata(:,columnChoice));
@@ -81,18 +79,18 @@ set(f,'Visible','on');
                 
                 colChoice = shdata(:,columnChoice);
                 maxPower = max(colChoice);
-                maxPowerRecent = max(colChoice(180:200));
-                minPowerRecent = min(colChoice(180:200));
+                maxPower = max(colChoice(180:200));
+                minPower = min(colChoice(180:200));
                 maxPowerString = ['Maximum Power: ' num2str(maxPower)];
                 averagePower = mean(colChoice);
                 averagePowerString = ['Average Power: ' num2str(averagePower)];
                 
-                if maxPower > 5000
+                if maxPower > 10000
                     colorValues = [1 0 0];
-                else if maxPowerRecent - minPowerRecent > 30
+                else if maxPower > 3000
                     colorValues = [1 .5 0];
                     else
-                      colorValues = [0 0 1];
+                      colorValues = [0 1 0];
                     end
                 end
                 
