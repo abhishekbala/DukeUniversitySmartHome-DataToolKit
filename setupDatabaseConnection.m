@@ -7,7 +7,7 @@ setdbprefs('NullStringRead', 'null');
 
 
 %ODBC connection to database.
-conn = database('smart_home', 'student', '');
+conn = database('Smart Home', 'student', '');
 ping(conn)
 
 %Set up cursor to read data using MySQL query
