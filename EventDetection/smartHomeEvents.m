@@ -20,8 +20,8 @@ ds.onEvents = nan(startInterval,1);
 ds.offEvents = nan(startInterval,1);
 
 h(1) = plot(timeWindow,ds.data,'k','linewidth',2) ; hold on ;
-h(2) = plot(timeWindow,ds.onEvents, 'ob');
-h(3) = plot(timeWindow,ds.offEvents, 'or');
+h(2) = plot(timeWindow,ds.onEvents, 'ob', 'linewidth',4);
+h(3) = plot(timeWindow,ds.offEvents, 'or', 'linewidth',4);
 xlabel('Time')
 ylabel('Magnitude')
 set(gca, 'xdir', 'reverse');
