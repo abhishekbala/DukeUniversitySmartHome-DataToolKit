@@ -1,21 +1,18 @@
 clear;
 
-load('smartHomeData.mat');
-noisyMeasurement = smartHomeData(1:1000,9);
-
-windowLength = length(noisyMeasurement);
+windowLength = 200;
 bufferLength = 29;
 
 timeWindow = 1:windowLength;
 bufferStartIndex = 1;
 bufferEndIndex = 1;
 
-% measurement = zeros(1,windowLength);
-% measurement(31:60) = 25;
-% measurement(61:75) = 75;
-% measurement(76:110) = 100;
-% measurement(111:150) = 75;
-% noisyMeasurement = awgn(measurement, 30, 'measured');
+measurement = zeros(1,windowLength);
+measurement(31:60) = 25;
+measurement(61:75) = 75;
+measurement(76:110) = 100;
+measurement(111:150) = 75;
+noisyMeasurement = awgn(measurement, 20, 'measured');
 
 figure(1);
 clf;
@@ -35,7 +32,6 @@ while bufferEndIndex < windowLength
             bufferStartIndex = bufferEndIndex + 1;
             bufferEndIndex = bufferEndIndex + 1
             z_score = z_score
-
             % EVENT DETECTED!
             plot(bufferStartIndex, noisyMeasurement(bufferStartIndex), 'ro', 'linewidth', 4);
         else 
