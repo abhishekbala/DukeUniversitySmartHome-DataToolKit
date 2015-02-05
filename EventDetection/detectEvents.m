@@ -37,6 +37,7 @@ midPoint    = (windowLength + 1)/2 ;
 bufferRange             = midPoint - bufferLength:midPoint + bufferLength ;
 filter                  = nan(windowLength,1) ;
 filter(1:midPoint-1)    = -1 ;
+%filter(midPoint+1:end) = 1./([midPoint + 1:windowLength] - midPoint);
 filter(midPoint+1:end)  =  1 ;
 filter(bufferRange)     =  0 ;
 
