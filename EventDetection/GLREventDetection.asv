@@ -12,6 +12,10 @@ function GLREventDetection(data)
     s = zeros(1, dataLength);
     v = zeros(1, dataLength);
     
+    
+    for n = 
+    end
+    
     while startIndex + wl - 1 + wa < length(data)
         startIndex = startIndex + 1;
         endIndex = startIndex + wl - 1;
