@@ -1,4 +1,4 @@
-function GLREventDetection(data)
+function [v] = GLREventDetection(data)
 % DETECT EVENTS USING GENERALIZED LIKELIHOOD RATIO
 
     wa = 100;

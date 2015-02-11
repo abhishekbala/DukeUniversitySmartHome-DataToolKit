@@ -16,9 +16,6 @@ yearInt = int(dateStr[0:4])
 monthInt = int(dateStr[5:7])
 #iff the month or day is less than ten, the zero before it gets cut off
 dayInt = int(dateStr[8:10])
-print dateStr
-print monthInt
-print dayInt
 
 
 # open a file for writing.
@@ -26,6 +23,7 @@ csv_out = open("mycsv.csv",'wb')
 
 # create the csv writer object.
 mywriter = csv.writer(csv_out)
+
 
 
 ###############
