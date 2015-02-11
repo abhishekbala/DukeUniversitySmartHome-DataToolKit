@@ -2,7 +2,7 @@
 """
 Created on Tue Feb 10 14:04:37 2015
 
-@author: Raghav Saboo (and Sharrin Manor) 
+@author: Raghav Saboo and Sharrin Manor 
 """
 
 import csv
