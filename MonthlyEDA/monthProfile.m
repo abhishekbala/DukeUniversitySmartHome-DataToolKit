@@ -15,9 +15,6 @@ function monthProfile(data)
   % Create contour
   contour(data,'LineColor','k','Fill','on','Parent',axes1);
 
-  % Create imagesc
-  imagesc(data)
-
   % Create xlabel
   xlabel('hours');
 
@@ -26,4 +23,7 @@ function monthProfile(data)
 
   % Create colorbar
   colorbar;
+  % Create imagesc
+  figure(2)
+  imagesc(data)
 
