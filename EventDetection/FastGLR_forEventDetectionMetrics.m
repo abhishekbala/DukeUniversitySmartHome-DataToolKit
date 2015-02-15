@@ -13,9 +13,9 @@
 % v_Threshold ==> Threshold value much be less than w_GLRLength. 
 %                   DEFAULT 25
 % SignalNoiseRatio ==> Determines how strong additive wgn is. 
-%                   DEFAULT 20
+%                   DEFAULT 1
 % preProcessOption ==> Values 0 to 4. 
-%                    DEFAULT 4: smoothing + additive
+%                    DEFAULT 3: smoothing + additive
 % GLRSmoothingOption ==> Values 0 to 4. 
 %                   DEFAULT 0: No smoothing
 % ZScoreValue ==> Threshold of transitional importance. 
@@ -28,8 +28,8 @@ if(nargin == 1)
     w_BeforeAfterLength = 40;
     w_GLRLength = 30;
     v_Threshold = 25;
-    SignalNoiseRatio = 20;
-    preProcessOption = 4;
+    SignalNoiseRatio = 1;
+    preProcessOption = 3;
     GLRSmoothingOption = 0;
     ZScoreValue = 4;
 end
