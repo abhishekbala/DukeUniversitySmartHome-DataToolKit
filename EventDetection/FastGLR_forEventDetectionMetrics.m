@@ -1,4 +1,4 @@
-    function eventsDetected = FastGLR_forEventDetectionMetrics(data, w_BeforeAfterLength, w_GLRLength, v_Threshold, SignalNoiseRatio, preProcessOption, GLRSmoothingOption, ZScoreValue)
+function eventsDetected = FastGLR_forEventDetectionMetrics(data, w_BeforeAfterLength, w_GLRLength, v_Threshold, SignalNoiseRatio, preProcessOption, GLRSmoothingOption, ZScoreValue)
 %% Parameters
 % Output: eventsDetected => Binary array of when events turn on. 1 = event
 % and 0 = non-event
@@ -20,9 +20,6 @@
 %                   DEFAULT 0: No smoothing
 % ZScoreValue ==> Threshold of transitional importance. 
 %                   DEFAULT 4: 99.99% Noise elminiation
-
-
-clf; % Clear Relevant Figures
 
 if(nargin == 1)
     w_BeforeAfterLength = 40;
@@ -119,7 +116,7 @@ while startIndex + wl - 1 + wa < length(data) % As long as the GLR window + wind
     Za = (modifiedData(smaxi) -  myDataStats(1, smaxi))./myDataStats(3, smaxi);
     Zb = (modifiedData(smaxi) -  myDataStats(2, smaxi))./myDataStats(4, smaxi);
     
-    if(Za < ZScoreValue && Zb < ZScoreValue) % 99.99% Interval
+    if(abs(Za) < ZScoreValue && abs(Zb) < ZScoreValue) % 99.99% Interval
         v(smaxi) = v(smaxi) + 0;
     else
         v(smaxi) = v(smaxi) + 1;
@@ -138,6 +135,8 @@ v = v.*(data');
 
 %% Plotting Relevant Features
 
+clf; % Clear Relevant Figures
+
 figure(1);
 hold on;
 plot(data);
@@ -147,5 +146,11 @@ title('Events detected');
 xlabel('Time Series Values (s)');
 ylabel('Power Values (W)');
 legend('Data', 'Events');
+
+% figure(2);
+% plot(l);
+% title('GLR Values for Each Point (No Smoothing)');
+% xlabel('Time Series Values (s)');
+% ylabel('GLR Values');
 
 end
