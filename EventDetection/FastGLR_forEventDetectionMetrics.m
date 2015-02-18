@@ -135,20 +135,20 @@ v = v.*(data');
 
 %% Plotting Relevant Features
 
-clf; % Clear Relevant Figures
-
-figure(1);
-hold on;
-plot(data);
-plot(v, 'ro', 'linewidth', 2);
-hold off;
-title('Events detected');
-xlabel('Time Series Values (s)');
-ylabel('Power Values (W)');
-legend('Data', 'Events');
-
+% clf; % Clear Relevant Figures
+% 
+% figure(1);
+% hold on;
+% plot(data);
+% plot(v, 'ro', 'linewidth', 2);
+% hold off;
+% title('Events detected');
+% xlabel('Time Series Values (s)');
+% ylabel('Power Values (W)');
+% legend('Data', 'Events');
+% 
 % figure(2);
-% plot(l);
+% plot(modifiedData);
 % title('GLR Values for Each Point (No Smoothing)');
 % xlabel('Time Series Values (s)');
 % ylabel('GLR Values');

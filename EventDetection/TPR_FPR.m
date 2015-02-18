@@ -1,11 +1,13 @@
-function [TPR, FPR] = TPR_FPR(truthVals, dataSet, w_BeforeAfterLength, w_GLRLength, v_Threshold, SignalNoiseRatio, preProcessOption, GLRSmoothingOption, ZScoreValue)
+function [PrDetection, FalseAlarmRate] = TPR_FPR(truthVals, dataSet, w_BeforeAfterLength, w_GLRLength, v_Threshold, SignalNoiseRatio, preProcessOption, GLRSmoothingOption, ZScoreValue)
 
 % Assumptions using this ROC function:
 % 1. The accepted truthVal must be a vector of length ceil(length(myVals)/10)
 
 %% Preprocessing of Data Set:
+dataSetLength = length(dataSet);
+totalTrueEvents = sum(truthVals);
 EventsDetected = FastGLR_forEventDetectionMetrics(dataSet, w_BeforeAfterLength, w_GLRLength, v_Threshold, SignalNoiseRatio, preProcessOption, GLRSmoothingOption, ZScoreValue);
-myEvents = zeros(1, ceil(length(EventsDetected)/10));
+myEvents = zeros(1, ceil((length(EventsDetected)+0.01)/10));
 
 for(k = 1:length(EventsDetected))
     if(EventsDetected(k) == 1)
@@ -33,9 +35,13 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-FPR = FP./(FP + TN);
-TPR = TP./(TP + FN);
+PrDetection = TP./totalTrueEvents;
+FalseAlarmRate = FP./dataSetLength;
+
 
 
 end
+
+% Probability of properly detecting an event = (# TP)/(#True events total)
+% False Alarm Rate = (#FP)/length(dataSet) ==> Gives us # false alarms/second
 
