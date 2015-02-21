@@ -19,7 +19,7 @@ tData = cell2mat(tData(:,5));
 tSeries = timeseries(tData, tTime);
 tSeriesStr = timeseries(tData, tTimestr);
 
-mergedData = merge(gridPower,temp);
+%mergedData = merge(gridPower,temp);
 
 f2=figure(2);
 cla
