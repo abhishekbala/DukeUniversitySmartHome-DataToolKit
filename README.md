@@ -1,4 +1,4 @@
-Duke Smart Home Data Analysis Toolkit
+Duke University Smart Home Data Toolkit
 ======================================
 This project provides a toolkit to disaggregate and detect anomalies in energy data. The specific modules of this toolkit are:
   1. Live data streaming and storage of smart meter data (from a MySQL database) and local temperature data (from online sources)
