@@ -14,7 +14,8 @@ dateStr = (time.strftime("%Y/%m/%d"))
 
 yearInt = int(dateStr[0:4])
 monthInt = int(dateStr[5:7])
-#iff the month or day is less than ten, the zero before it gets cut off
+
+# iff the month or day is less than ten, the zero before it gets cut off
 dayInt = int(dateStr[8:10])
 
 
