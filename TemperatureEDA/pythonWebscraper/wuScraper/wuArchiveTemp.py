@@ -20,7 +20,7 @@ dayInt = int(dateStr[8:10])
 
 
 # open a file for writing.
-csv_out = open("mycsv.csv",'wb')
+csv_out = open("wuTempArchive.csv",'wb')
 
 # create the csv writer object.
 mywriter = csv.writer(csv_out)

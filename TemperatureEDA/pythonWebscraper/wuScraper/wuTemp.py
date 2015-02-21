@@ -25,9 +25,9 @@ while 1:
     date = re.findall(pattern2,htmltext)
     data = [[temp[6],date]]
     # Open the csv file storing the Temperature Date
-    with open("wuTempData.csv",'a') as csv_out:
+    with open("wuTempData.csv",'a') as csvOut:
         # Write the data from Weather Underground to local csv
-        csvwriter = csv.writer(csv_out,delimiter=',',dialect='excel')
+        csvwriter = csv.writer(csvOut,delimiter=',',dialect='excel')
         csvwriter.writerows(data)
     # Count the number of rows in the csv file
     with open("wuTempData.csv", 'rb') as csvFile:
@@ -35,16 +35,16 @@ while 1:
         rowCount = sum(1 for row in reader)
     # If the csv file is too big, truncate it
     if rowCount > 60:
-        with open("wuTempData.csv", 'rb') as f:
-            with open("wuTempData1.csv", 'wb') as f1:
+        with open("wuTempData.csv", 'rb') as csvFileBig:
+            with open("wuTempData1.csv", 'wb') as csvFile1:
                 for _ in range(30):
-                    f.next();
-                for line in f:
-                    f1.write(line)   
+                    csvFileBig.next();
+                for line in csvFileBig:
+                    csvFile1.write(line)   
         os.remove("wuTempData.csv")
         os.rename("wuTempData1.csv","wuTempData.csv")
         # Schedule the next run
-    nextRun = datetime.now() + timedelta(seconds = 0.5)
+    nextRun = datetime.now() + timedelta(seconds = 10)
     # Enter another while loop until time for the next run
     while 1:
         if datetime.now() > nextRun:
