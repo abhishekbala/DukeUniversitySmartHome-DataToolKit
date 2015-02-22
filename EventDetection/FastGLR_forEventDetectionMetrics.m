@@ -1,4 +1,4 @@
-function eventsDetected = FastGLR_forEventDetectionMetrics(data, w_BeforeAfterLength, w_GLRLength, v_Threshold, SignalNoiseRatio, preProcessOption, GLRSmoothingOption, ZScoreValue)
+function eventsDetected = FastGLR_forEventDetectionMetrics(data, w_BeforeAfterLength, w_GLRLength, SignalNoiseRatio, preProcessOption, GLRSmoothingOption, ZScoreValue)
 %% Parameters
 % Output: eventsDetected => Binary array of when events turn on. 1 = event
 % and 0 = non-event
@@ -10,8 +10,6 @@ function eventsDetected = FastGLR_forEventDetectionMetrics(data, w_BeforeAfterLe
 %                   DEFAULT: 40
 % w_GLRLength ==> Increase or decrease window which we calculate GLR.
 %                   DEFAULT: 30
-% v_Threshold ==> Threshold value much be less than w_GLRLength. 
-%                   DEFAULT 25
 % SignalNoiseRatio ==> Determines how strong additive wgn is. 
 %                   DEFAULT 1
 % preProcessOption ==> Values 0 to 4. 
@@ -24,7 +22,7 @@ function eventsDetected = FastGLR_forEventDetectionMetrics(data, w_BeforeAfterLe
 if(nargin == 1)
     w_BeforeAfterLength = 40;
     w_GLRLength = 30;
-    v_Threshold = 25;
+%     v_Threshold = 25;
     SignalNoiseRatio = 1;
     preProcessOption = 3;
     GLRSmoothingOption = 0;
@@ -39,7 +37,12 @@ wb = w_BeforeAfterLength; % Window of the previous 100 points
 current = wb; % Initialize the point in which the pointer starts at
 startIndex = current; % Initialize the start index at the 100th data point
 wl = w_GLRLength; % Window in which we calculate the GLR
-vt = v_Threshold; % Voting threshold
+
+% We are getting rid of this parameter in order to vary and make the ROC
+% Curves
+% % % % % % % % % vt = v_Threshold; % Voting threshold
+
+
 dataLength = length(data); % Length of the data
 l = zeros(1, dataLength); % GLR values for all the data points in set
 s = zeros(1, dataLength); % Generalized voting statistic for data points
@@ -128,12 +131,16 @@ end
 
 %% Thresholding the vote counts. Normalizing vote count to data and plotting:
 %sum(v);
-v(v < vt) = 0;
-v(v >= vt) = 1;
+% % % % % % % v(v < vt) = 0;
+% % % % % % % v(v >= vt) = 1;
+% % % % % % % eventsDetected = v;
+% % % % % % % v = v.*(data');
+
 eventsDetected = v;
-v = v.*(data');
 
 %% Plotting Relevant Features
+
+% plot(v);
 
 % clf; % Clear Relevant Figures
 % 
@@ -146,7 +153,7 @@ v = v.*(data');
 % xlabel('Time Series Values (s)');
 % ylabel('Power Values (W)');
 % legend('Data', 'Events');
-% 
+
 % figure(2);
 % plot(modifiedData);
 % title('GLR Values for Each Point (No Smoothing)');

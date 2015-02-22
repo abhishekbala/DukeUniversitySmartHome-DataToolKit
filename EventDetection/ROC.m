@@ -1,8 +1,8 @@
 function ROC(truthVals, dataSet)
 
 clf;
-Vt = 1:4:21; % Voting Thresholds
-maxVt = 21;
+Vt = 0:1:31; % Voting Thresholds
+maxVt = 31;
 PrDetection = zeros(size(Vt));
 FAR = zeros(size(Vt));
 
@@ -180,22 +180,23 @@ FAR = zeros(size(Vt));
 
 
 %% This section varies the parameter ZScoreValue
-% 
+
 % figure(1);
 % hold on;
-% for(zVal = 0:4)
+% for(zVal = 0:0.5:4)
+%     votes = FastGLR_forEventDetectionMetrics(dataSet, 40, 30, 1, 3, 0, zVal);
 %     for(i = 1:length(Vt))
-%         [TPR, FPR] = TPR_FPR(truthVals, dataSet, 40, maxVt, Vt(i), 1, 3, 0, zVal);
+%         [TPR, FPR] = ROCRates(truthVals, dataSet, votes, Vt(i));
 %         PrDetection(i) = TPR;
 %         FAR(i) = FPR;
 %     end
-%     plot(FAR, PrDetection);
+%     subplot(2,5,(2*zVal+1)); plot(FAR, PrDetection);
+%     title(['ROC Curve for Z-Score = ' num2str(zVal)]);
+%     xlabel('False Alarm Rate (FAR)');
+%     ylabel('Probability of Detection (TPR)');
+%     axis([-0.01 0.12 -0.1 1.1]);
 % end
 % hold off;
-% title('ROC Curve for Various Z-Score Value');
-% xlabel('False Alarm Rate (FAR)');
-% ylabel('Probability of Detection (TPR)');
-% legend('Z = 0', 'Z = 1', 'Z = 2', 'Z = 3', 'Z = 4');
 
 %% This Section Varies the Parameter GLRSmoothing
 % % 0 ==> No smoothing
@@ -209,20 +210,20 @@ FAR = zeros(size(Vt));
 % figure(1);
 % hold on;
 % for(i = 1: length(Vals))
+%     votes = FastGLR_forEventDetectionMetrics(dataSet, 40, 30, 1, 3, Vals(i), 4);
 %     for(j = 1:length(Vt))
-%         [TPR, FPR] = TPR_FPR(truthVals, dataSet, 40, maxVt, Vt(j), 1, 3, Vals(i), 4);
+%         [TPR, FPR] = ROCRates(truthVals, dataSet, votes, Vt(j));
 %         PrDetection(j) = TPR;
 %         FAR(j) = FPR;
 %     end
-%     plot(FAR, PrDetection);
+%     subplot(2,3,(Vals(i)+1)); plot(FAR, PrDetection);
+%     title(['ROC Curve for GLRSmoothing Parameter ' num2str(Vals(i))]);
+%     xlabel('False Alarm Rate (FAR)');
+%     ylabel('Probability of Detection (TPR)');
+%     axis([-0.01 0.12 -0.1 1.1]);
 % end
 % 
 % hold off;
-% title('ROC Curve for Various GLR Smoothing Parameters');
-% xlabel('False Alarm Rate (FAR)');
-% ylabel('Probability of Detection (TPR)');
-% legend('Parameter 0', 'Parameter 1', 'Parameter 2', 'Parameter 3', 'Parameter 4');
-
 
 %% This Section Varies Preprocessing Option
 % % 0 ==> No preprocessing
@@ -231,40 +232,44 @@ FAR = zeros(size(Vt));
 % % 3 ==> First add WGN, then Savitsky-Goly Smoothing
 % % 4 ==> Firsts smooths using Savitsky-Golay, then adding wgn.
 % 
+% 
 % Vals = [0, 1, 2, 3, 4];
 % 
 % figure(1);
 % hold on;
-% for(i = 1:length(Vals))
+% for(i = 1: length(Vals))
+%     votes = FastGLR_forEventDetectionMetrics(dataSet, 40, 30, 1, Vals(i), 0, 4);
 %     for(j = 1:length(Vt))
-%         [TPR, FPR] = TPR_FPR(truthVals, dataSet, 40, maxVt, Vt(j), 1, Vals(i), 0, 4);
+%         [TPR, FPR] = ROCRates(truthVals, dataSet, votes, Vt(j));
 %         PrDetection(j) = TPR;
 %         FAR(j) = FPR;
 %     end
-%     plot(PrDetection, FAR);
+%     subplot(2,3,(Vals(i)+1)); plot(FAR, PrDetection);
+%     title(['ROC Curve for Pre-processing Parameter ' num2str(Vals(i))]);
+%     xlabel('False Alarm Rate (FAR)');
+%     ylabel('Probability of Detection (TPR)');
+%     axis([-0.01 0.12 -0.1 1.1]);
 % end
+% 
 % hold off;
-% title('ROC Curve for Variation of Preprocessing Parameters');
-% xlabel('False Alarm Rate (FAR)');
-% ylabel('Probability of Detection');
-% legend('Parameter 0', 'Parameter 1', 'Parameter 2', 'Parameter 3', 'Parameter 4');
-
 
 %% This Section Varies Signal to Noise Ratio
-% Vals = -10:5:30;
+% Vals = -30:5:30;
 % 
 % figure(1);
 % hold on;
 % for(i = 1:length(Vals))
+%     votes = FastGLR_forEventDetectionMetrics(dataSet, 40, 30, Vals(i), 3, 0, 4);
 %     for(j = 1:length(Vt))
-%         [TPR, FPR] = TPR_FPR(truthVals, dataSet, 40, maxVt, Vt(j), Vals(i), 3, 0, 4);
+%         [TPR, FPR] = ROCRates(truthVals, dataSet, votes, Vt(j));
 %         PrDetection(j) = TPR;
 %         FAR(j) = FPR;
 %     end
-%     subplot(3,3,i); plot(FAR, PrDetection);
+%     subplot(3,5,i); plot(FAR, PrDetection);
 %     title(['ROC Curve for SNR ' num2str(Vals(i))]);
 %     xlabel('False Alarm Rate (FAR)');
 %     ylabel('Probability of Detection');
+%     axis([-0.01 0.12 -0.1 1.1]);
 % end
 % hold off;
 
@@ -274,8 +279,9 @@ Vals = 5:5:40;
 figure(1);
 hold on;
 for(i = 1:length(Vals))
+    votes = FastGLR_forEventDetectionMetrics(dataSet, Vals(i), 30, 1, 3, 0, 4);
     for(j = 1:length(Vt))
-        [TPR, FPR] = TPR_FPR(truthVals, dataSet, Vals(i), maxVt, Vt(j), 1, 3, 0, 4);
+        [TPR, FPR] = ROCRates(truthVals, dataSet, votes, Vt(j));
         PrDetection(j) = TPR;
         FAR(j) = FPR;
     end
@@ -283,6 +289,7 @@ for(i = 1:length(Vals))
     title(['ROC Curve for SWL ' num2str(Vals(i))]);
     xlabel('False Alarm Rate (FAR)');
     ylabel('Probability of Detection');
+    axis([-0.01 0.12 -0.1 1.1]);
 end
 hold off;
 
