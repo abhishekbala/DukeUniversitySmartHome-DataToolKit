@@ -21,16 +21,16 @@ tSeriesStr = timeseries(tData, tTimestr);
 
 %mergedData = merge(gridPower,temp);
 
-f2=figure(2);
-cla
-h2=plot(powerData,'Color','red');
-ax1 = gca;
-set(ax1,'XColor','r','YColor','r')
-hold on
-ax2 = axes('position',get(ax1,'position'));
-plot(tSeries)
-set(ax2, 'YAxisLocation','right', 'Color','none','xlim', get(ax1, 'xlim'));
-set(f2,'CurrentAxes',ax2);
+% f2=figure(2);
+% cla
+% h2=plot(powerData,'Color','red');
+% ax1 = gca;
+% set(ax1,'XColor','r','YColor','r')
+% hold on
+% ax2 = axes('position',get(ax1,'position'));
+% plot(tSeries)
+% set(ax2, 'YAxisLocation','right', 'Color','none','xlim', get(ax1, 'xlim'));
+% set(f2,'CurrentAxes',ax2);
 
 f3=figure(3);
 cla
