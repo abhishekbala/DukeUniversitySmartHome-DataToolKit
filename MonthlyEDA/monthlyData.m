@@ -34,7 +34,7 @@ curs = exec(conn,mySQLquery);
 % curs = fetch(curs,2678400);
 % If 30 days
 curs = fetch(curs,2592000);
-
+% For 7 days
 shData = curs.Data;
 
 close(curs);
