@@ -40,6 +40,10 @@ shData = curs.Data;
 close(curs);
 shData1(:,1) = sum(shData(:,1),2);
 shData1(:,2) = sum(shData(:,2:3),2) - sum(shData(:,4:5),2);
+shData1(:,3) = shData(:,2);
+shData1(:,4) = shData(:,3);
+shData1(:,5) = shData(:,4);
+shData1(:,6) = shData(:,5);
 sum(sum(shData(:,2:4),2)>shData1(:,2))
 shData2(:,1) = sum(shData(:,1),2);
 shData2(:,2) = sum(shData(:,2:3),2) - sum(shData(:,4:5),2) - sum(shData(:,6:9),2);
