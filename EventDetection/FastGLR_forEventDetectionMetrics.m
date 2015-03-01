@@ -131,12 +131,12 @@ end
 
 %% Thresholding the vote counts. Normalizing vote count to data and plotting:
 %sum(v);
-% % % % % % % v(v < vt) = 0;
-% % % % % % % v(v >= vt) = 1;
-% % % % % % % eventsDetected = v;
-% % % % % % % v = v.*(data');
+vt = 25;
 
+v(v < vt) = 0;
+v(v >= vt) = 1;
 eventsDetected = v;
+v = v.*(data');
 
 %% Plotting Relevant Features
 
