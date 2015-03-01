@@ -39,10 +39,10 @@ while 1:
         reader = csv.reader(csvFile)
         rowCount = sum(1 for row in reader)
     # If CSV file is unnecessarily long, truncate.
-    if rowCount > 60:
+    if rowCount > 200:
         with open("shData.csv", 'rb') as csvFileBig:
             with open("shData1.csv", 'wb') as csvFile1:
-                for _ in range(30):
+                for _ in range(1):
                     csvFileBig.next();
                 for line in csvFileBig:
                     csvFile1.write(line)   
