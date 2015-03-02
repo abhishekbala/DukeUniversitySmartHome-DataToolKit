@@ -133,7 +133,7 @@ end
 %sum(v);
 vt = 25;
 
-v(v < vt) = 0;
+v(v < vt) = NaN;
 v(v >= vt) = 1;
 eventsDetected = v;
 v = v.*(data');
@@ -142,17 +142,17 @@ v = v.*(data');
 
 % plot(v);
 
-% clf; % Clear Relevant Figures
-% 
-% figure(1);
-% hold on;
-% plot(data);
-% plot(v, 'ro', 'linewidth', 2);
-% hold off;
-% title('Events detected');
-% xlabel('Time Series Values (s)');
-% ylabel('Power Values (W)');
-% legend('Data', 'Events');
+clf; % Clear Relevant Figures
+
+figure(1);
+hold on;
+plot(data);
+plot(v, 'ro', 'linewidth', 2);
+hold off;
+title('Events detected');
+xlabel('Time Series Values (s)');
+ylabel('Power Values (W)');
+legend('Data', 'Events');
 
 % figure(2);
 % plot(modifiedData);
