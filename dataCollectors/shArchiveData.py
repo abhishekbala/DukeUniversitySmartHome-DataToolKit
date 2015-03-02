@@ -34,26 +34,33 @@ connection=pymysql.connect(
 	cursorclass = pymysql.cursors.SSCursor)
 cursor=connection.cursor()
 
+x = 0
+uTime = int(unixTime[0:9])
+    #while x < 86400:
+while x<500:
+	# Query the MySQL database.
 
-# Query the MySQL database.
+## ONLY IS WRITING TWO LINES NEED TO DEBUG
 
-# 1 second worth of data.
-cursor.execute("SELECT smarthome.timestamp,	smarthome.b7139_01_r_01_phase1 \
-, smarthome.b7139_01_r_02_phase2 FROM energydata.smarthome \
-WHERE smarthome.timestamp =" +unixTime+ " \
-ORDER BY smarthome.timestamp ASC")
 
-# Store the 1 second data locally.
-shData = [row for row in cursor]
-# Store in csv (append).
-with open("shArchiveData.csv",'a') as csvOut:
-	csvwriter = csv.writer(csvOut,delimiter=',',dialect='excel')
-	csvwriter.writerows(shData)
-# Check the length of the CSV file.
-with open("shArchiveData.csv",'rb') as csvFile:
-	reader = csv.reader(csvFile)
-	rowCount = sum(1 for row in reader)
+	# 1 second worth of data.
+	cursor.execute("SELECT smarthome.timestamp,	smarthome.b7139_01_r_01_phase1 \
+	, smarthome.b7139_01_r_02_phase2 FROM energydata.smarthome \
+	WHERE smarthome.timestamp =" + str(uTime) + " \
+	ORDER BY smarthome.timestamp ASC")
 
+	# Store the 1 second data locally.
+	shData = [row for row in cursor]
+	# Store in csv (append).
+	with open("shArchiveData.csv",'a') as csvOut:
+		csvwriter = csv.writer(csvOut,delimiter=',',dialect='excel')
+		csvwriter.writerows(shData)
+	# Check the length of the CSV file.
+	with open("shArchiveData.csv",'rb') as csvFile:
+		reader = csv.reader(csvFile)
+		rowCount = sum(1 for row in reader)
+	x = x+1
+	uTime = uTime +1
 
 
 
