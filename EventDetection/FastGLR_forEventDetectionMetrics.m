@@ -22,12 +22,14 @@ function eventsDetected = FastGLR_forEventDetectionMetrics(data, w_BeforeAfterLe
 if(nargin == 1)
     w_BeforeAfterLength = 40;
     w_GLRLength = 30;
-%     v_Threshold = 25;
+    v_Threshold = 25;
     SignalNoiseRatio = 1;
     preProcessOption = 3;
     GLRSmoothingOption = 0;
     ZScoreValue = 4;
 end
+
+v_Threshold = 25;
 
 %% DETECT EVENTS USING GENERALIZED LIKELIHOOD RATIO
 
@@ -40,13 +42,16 @@ wl = w_GLRLength; % Window in which we calculate the GLR
 
 % We are getting rid of this parameter in order to vary and make the ROC
 % Curves
-% % % % % % % % % vt = v_Threshold; % Voting threshold
+vt = v_Threshold; % Voting threshold
 
 
 dataLength = length(data); % Length of the data
 l = zeros(1, dataLength); % GLR values for all the data points in set
 s = zeros(1, dataLength); % Generalized voting statistic for data points
 v = zeros(1, dataLength); % Votes for each particular data point
+
+v_onEvents = zeros(1, dataLength); % Votes for on events specifically
+v_offEvents = zeros(1, dataLength); % Votes for off events specifically
 
 SNR = SignalNoiseRatio; % Signal to Noise Ratio
 
@@ -123,6 +128,11 @@ while startIndex + wl - 1 + wa < length(data) % As long as the GLR window + wind
         v(smaxi) = v(smaxi) + 0;
     else
         v(smaxi) = v(smaxi) + 1;
+        if(Za > 0)
+            v_offEvents(smaxi) = v_offEvents(smaxi) + 1;
+        elseif(Za < 0)
+            v_onEvents(smaxi) = v_onEvents(smaxi) + 1;
+        end
     end
     
     
@@ -130,13 +140,20 @@ while startIndex + wl - 1 + wa < length(data) % As long as the GLR window + wind
 end
 
 %% Thresholding the vote counts. Normalizing vote count to data and plotting:
-%sum(v);
-vt = 25;
+
+eventsDetected = v;
 
 v(v < vt) = NaN;
 v(v >= vt) = 1;
-eventsDetected = v;
 v = v.*(data');
+
+v_onEvents(v_onEvents < vt) = 0;
+v_onEvents(v_onEvents >= vt) = 1;
+v_onEvents = v_onEvents.*(data');
+
+v_offEvents(v_offEvents < vt) = 0;
+v_offEvents(v_offEvents >= vt) = 1;
+v_offEvents = v_offEvents.*(data');
 
 %% Plotting Relevant Features
 
@@ -147,7 +164,8 @@ clf; % Clear Relevant Figures
 figure(1);
 hold on;
 plot(data);
-plot(v, 'ro', 'linewidth', 2);
+plot(v_onEvents, 'ro', 'linewidth', 2);
+plot(v_offEvents, 'go', 'linewidth', 2);
 hold off;
 title('Events detected');
 xlabel('Time Series Values (s)');

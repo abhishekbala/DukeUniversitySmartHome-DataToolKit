@@ -34,18 +34,20 @@ while 1:
     with open("shData.csv",'a') as csvOut:
         csvwriter = csv.writer(csvOut,delimiter=',',dialect='excel')
         csvwriter.writerows(shData)
+    # Lock file to Python
     # Check the length of the CSV file.
     with open("shData.csv",'rb') as csvFile:
         reader = csv.reader(csvFile)
         rowCount = sum(1 for row in reader)
     # If CSV file is unnecessarily long, truncate.
-    if rowCount > 5000:
+    if rowCount > 2100:
+        print "Length >2000"
         with open("shData.csv", 'rb') as csvFileBig:
             with open("shData1.csv", 'wb') as csvFile1:
-                for _ in range(1):
+                for _ in range(200):
                     csvFileBig.next();
                 for line in csvFileBig:
-                    csvFile1.write(line)   
+                    csvFile1.write(line)
         os.remove("shData.csv")
         os.rename("shData1.csv","shData.csv")
     # Pause for 1 second and then repeat. Could use more sophisticated wait
