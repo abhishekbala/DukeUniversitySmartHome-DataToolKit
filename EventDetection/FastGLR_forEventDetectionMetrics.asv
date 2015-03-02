@@ -141,10 +141,9 @@ end
 
 %% Thresholding the vote counts. Normalizing vote count to data and plotting:
 
-eventsDetected = v;
-
 v(v < vt) = 0;
 v(v >= vt) = 1;
+
 v = v.*(data');
 
 v_onEvents(v_onEvents < vt) = 0;
