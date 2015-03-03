@@ -6,7 +6,9 @@ setdbprefs('NullStringRead', 'null');
 setdbprefs('FetchInBatches', 'yes');
 setdbprefs('FetchBatchSize', '10000');
 
-conn = database('Smart Home', 'student', '');
+conn = database('shenergydata', 'student', 'bassconnex', ...
+    'Vendor', 'MySQL', 'Server', '67.159.81.86', 'AuthType', 'Server',...
+    'portnumber', 3306);
 ping(conn)
 
 %mySQLquery = ['SELECT 	timestamp'...
