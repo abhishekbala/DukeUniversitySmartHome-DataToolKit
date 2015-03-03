@@ -8,9 +8,13 @@ function liveDisaggregation()
         fullSet = catObservations(fullSet, featureSet);
     end
     
+    knnClassifier = prtClassKnn;
+    knnClassifier.k = 8;
+    knnClassifier = knnClassifier.train(fullSet);
+    
     while 1
         liveData = csvread('../dataCollectors/shData.csv');
-        endRow = length(liveData(:,1));
+        % endRow = length(liveData(:,1));
 
         % Original data
         %figure(1);
@@ -18,12 +22,12 @@ function liveDisaggregation()
 
         % Keep window (for plotting) at 300seconds (can be changed to any value
         % upto 1800).
-        window = 300;
+        % window = 300;
 %        times = liveData(endRow-window:endRow,1);
-        aggregatePower = sum(liveData(endRow-window:endRow,2:3),2);
-
+        aggregatePower = sum(liveData(:,2:3),2);
+        dataLength = length(aggregatePower);
         % Plot
-        refresh
+        % refresh
 %        figure(1);
 %        plot(times,aggregatePower);
 
@@ -31,14 +35,11 @@ function liveDisaggregation()
         [on, off, events] = GLR_EventDetection(aggregatePower,40,30,25,-10,3,0,6);
         
         % Disaggregation
-        for i = 1:window
+        for i = 1:dataLength
             if on(i) == 1
                 eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
                 eventFeatures = prtDataSetClass(eventWindow);
                 
-                knnClassifier = prtClassKnn;
-                knnClassifier.k = 8;
-                knnClassifier = knnClassifier.train(fullSet);
                 knnClassOut = knnClassifier.run(eventFeatures);
                 
                 [~, dcsID] = max(knnClassOut.data);
