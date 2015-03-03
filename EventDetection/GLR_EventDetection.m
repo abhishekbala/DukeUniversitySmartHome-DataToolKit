@@ -1,4 +1,4 @@
-function eventsDetected = FastGLR_forEventDetectionMetrics(data, w_BeforeAfterLength, w_GLRLength, SignalNoiseRatio, preProcessOption, GLRSmoothingOption, ZScoreValue)
+function [eventsDetected_on, eventsDetected_off, eventsDetected] = GLR_EventDetection(data, w_BeforeAfterLength, w_GLRLength, v_Threshold, SignalNoiseRatio, preProcessOption, GLRSmoothingOption, ZScoreValue)
 %% Parameters
 % Output: eventsDetected => Binary array of when events turn on. 1 = event
 % and 0 = non-event
@@ -19,6 +19,10 @@ function eventsDetected = FastGLR_forEventDetectionMetrics(data, w_BeforeAfterLe
 % ZScoreValue ==> Threshold of transitional importance. 
 %                   DEFAULT 4: 99.99% Noise elminiation
 
+% Timing
+%clock
+
+
 if(nargin == 1)
     w_BeforeAfterLength = 40;
     w_GLRLength = 30;
@@ -29,8 +33,6 @@ if(nargin == 1)
     ZScoreValue = 4;
 end
 
-v_Threshold = 25;
-
 %% DETECT EVENTS USING GENERALIZED LIKELIHOOD RATIO
 
 %% Defining Variables
@@ -40,8 +42,6 @@ current = wb; % Initialize the point in which the pointer starts at
 startIndex = current; % Initialize the start index at the 100th data point
 wl = w_GLRLength; % Window in which we calculate the GLR
 
-% We are getting rid of this parameter in order to vary and make the ROC
-% Curves
 vt = v_Threshold; % Voting threshold
 
 
@@ -141,41 +141,48 @@ end
 
 %% Thresholding the vote counts. Normalizing vote count to data and plotting:
 
-eventsDetected = v;
-
-v(v < vt) = NaN;
+v(v < vt) = 0;
 v(v >= vt) = 1;
-v = v.*(data');
+v_scaled = v.*(data');
 
 v_onEvents(v_onEvents < vt) = 0;
 v_onEvents(v_onEvents >= vt) = 1;
-v_onEvents = v_onEvents.*(data');
+v_onEvents_scaled = v_onEvents.*(data');
 
 v_offEvents(v_offEvents < vt) = 0;
 v_offEvents(v_offEvents >= vt) = 1;
-v_offEvents = v_offEvents.*(data');
+v_offEvents_scaled = v_offEvents.*(data');
+
+eventsDetected = v;
+eventsDetected_on = v_onEvents;
+eventsDetected_off = v_offEvents;
+
+%% End Timing:
+%clock
 
 %% Plotting Relevant Features
-
-% plot(v);
-
 clf; % Clear Relevant Figures
 
 figure(1);
 hold on;
 plot(data);
-plot(v_onEvents, 'ro', 'linewidth', 2);
-plot(v_offEvents, 'go', 'linewidth', 2);
+plot(v_onEvents_scaled, 'ro', 'linewidth', 2);
+plot(v_offEvents_scaled, 'go', 'linewidth', 2);
 hold off;
 title('Events detected');
 xlabel('Time Series Values (s)');
 ylabel('Power Values (W)');
 legend('Data', 'Events');
 
-% figure(2);
-% plot(modifiedData);
-% title('GLR Values for Each Point (No Smoothing)');
-% xlabel('Time Series Values (s)');
-% ylabel('GLR Values');
+figure(2);
+hold on;
+plot(data);
+plot(v_scaled, 'ro', 'linewidth', 2);
+hold off;
+title('Events detected');
+xlabel('Time Series Values (s)');
+ylabel('Power Values (W)');
+legend('Data', 'Events');
 
 end
+
