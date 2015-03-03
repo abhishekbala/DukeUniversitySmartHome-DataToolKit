@@ -1,16 +1,16 @@
 function liveDisaggregation()
 
-    matFiles = prtUtilSubDir('','*.mat');
-    fullSet = prtDataSetClass();
-    for iFile = 1:length(matFiles)
-        cFile = matFiles{iFile};
-        load(cFile);
-        fullSet = catObservations(fullSet, featureSet);
-    end
-    
-    knnClassifier = prtClassKnn;
-    knnClassifier.k = 8;
-    knnClassifier = knnClassifier.train(fullSet);
+%     matFiles = prtUtilSubDir('','*.mat');
+%     fullSet = prtDataSetClass();
+%     for iFile = 1:length(matFiles)
+%         cFile = matFiles{iFile};
+%         load(cFile);
+%         fullSet = catObservations(fullSet, featureSet);
+%     end
+%     
+%     knnClassifier = prtClassKnn;
+%     knnClassifier.k = 8;
+%     knnClassifier = knnClassifier.train(fullSet);
     
     while 1
         liveData = csvread('../dataCollectors/shData.csv');
@@ -32,30 +32,30 @@ function liveDisaggregation()
 %        plot(times,aggregatePower);
 
         % Event Detection
-        [on, off, events] = GLR_EventDetection(aggregatePower,40,30,25,-10,3,0,6);
+        [on, off, events] = GLR_EventDetection(aggregatePower,20,10,8,-10,3,0,4);
         
         % Disaggregation
-        for i = 1:dataLength
-            if on(i) == 1
-                eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
-                eventFeatures = prtDataSetClass(eventWindow);
-                
-                knnClassOut = knnClassifier.run(eventFeatures);
-                
-                [~, dcsID] = max(knnClassOut.data);
-            end
-            if off(i) == 1
-                eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
-                eventFeatures = prtDataSetClass(eventWindow);
-                
-                knnClassifier = prtClassKnn;
-                knnClassifier.k = 8;
-                knnClassifier = knnClassifier.train(fullSet);
-                knnClassOut = knnClassifier.run(eventFeatures);
-                
-                [~, dcsID] = max(knnClassOut.data);
-            end
-        end
+%         for i = 1:dataLength
+%             if on(i) == 1
+%                 eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
+%                 eventFeatures = prtDataSetClass(eventWindow);
+%                 
+%                 knnClassOut = knnClassifier.run(eventFeatures);
+%                 
+%                 [~, dcsID] = max(knnClassOut.data);
+%             end
+%             if off(i) == 1
+%                 eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
+%                 eventFeatures = prtDataSetClass(eventWindow);
+%                 
+%                 knnClassifier = prtClassKnn;
+%                 knnClassifier.k = 8;
+%                 knnClassifier = knnClassifier.train(fullSet);
+%                 knnClassOut = knnClassifier.run(eventFeatures);
+%                 
+%                 [~, dcsID] = max(knnClassOut.data);
+%             end
+%         end
 
         % 1 second pause
         pause(1)
