@@ -15,7 +15,8 @@ function liveEventDetection()
     %plot(times, aggregatePower);
     
     % Event Detection
-    FastGLR_forEventDetectionMetrics(aggregatePower,40,30,-10,3,0,6);
+    %FastGLR_forEventDetectionMetrics(aggregatePower,40,30,1,3,0,4);
+    GLR_EventDetection(aggregatePower);
     
     % 1 second pause
     pause(1)
