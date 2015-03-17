@@ -5,7 +5,7 @@ function liveDisaggregation()
 %     for iFile = 1:length(matFiles)
 %         cFile = matFiles{iFile};
 %         load(cFile);
-%         fullSet = catObservations(fullSet, featureSet);
+%         fullSet = catObservations(fullSet, onFeatureSet);
 %     end
 %     
 %     knnClassifier = prtClassKnn;
