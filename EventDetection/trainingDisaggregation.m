@@ -6,8 +6,10 @@ function trainingDisaggregation(trainingDataSet, applianceLabel)
     [on, off, events] = GLR_EventDetection(trainingDataSet,40,30,25,-10,3,0,6);
 
     trainingWindow = 10;
-    onFilePath = cat(2, applianceLabel, 'OnFeatures.mat');
-    offFilePath = cat(2, applianceLabel, 'OffFeatures.mat');
+%     onFilePath = cat(2, applianceLabel, 'OnFeatures.mat');
+%     offFilePath = cat(2, applianceLabel, 'OffFeatures.mat');
+    onFilePath = cat(2, applianceLabel, 'OnFeatures');
+    offFilePath = cat(2, applianceLabel, 'OffFeatures');
     
     % Load features if exist
     if exist(onFilePath, 'file')
@@ -38,8 +40,13 @@ function trainingDisaggregation(trainingDataSet, applianceLabel)
         end
     end
     
+    
+    % Added by Aus
+    eval(sprintf('%s = onFeatureSet', onFilePath));
+    eval(sprintf('%s = offFeatureSet', offFilePath));
+    
     % Resave features
-    save(onFilePath, 'featureSet');
-    save(offFilePath, 'featureSet');
+    save('featureSet', onFilePath, offFilePath);
+    %save('featureSet', offFilePath);
     
 end
