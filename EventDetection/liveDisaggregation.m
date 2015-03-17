@@ -48,9 +48,6 @@ function liveDisaggregation()
 %                 eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
 %                 eventFeatures = prtDataSetClass(eventWindow);
 %                 
-%                 knnClassifier = prtClassKnn;
-%                 knnClassifier.k = 8;
-%                 knnClassifier = knnClassifier.train(fullSet);
 %                 knnClassOut = knnClassifier.run(eventFeatures);
 %                 
 %                 [~, dcsID] = max(knnClassOut.data);

@@ -1,4 +1,4 @@
-function trainingDisaggregation(trainingDataSet, applianceLabel)
+function trainingDisaggregation(trainingDataSet, applianceLabel, decisionIDs)
 
     dataLength = length(trainingDataSet);
     
@@ -6,43 +6,37 @@ function trainingDisaggregation(trainingDataSet, applianceLabel)
     [on, off, events] = GLR_EventDetection(trainingDataSet,40,30,25,-10,3,0,6);
 
     trainingWindow = 10;
-%     onFilePath = cat(2, applianceLabel, 'OnFeatures.mat');
-%     offFilePath = cat(2, applianceLabel, 'OffFeatures.mat');
     onFilePath = cat(2, applianceLabel, 'OnFeatures');
     offFilePath = cat(2, applianceLabel, 'OffFeatures');
     
     % Load features if exist
+    exist = 0;
     if exist(onFilePath, 'file')
         onFeatures = load(onFilePath);
         onFeatureSet = onFeatures.featureSet;
-    else
-        onFeatureSet = prtDataSetClass();
-    end
-    
+        exist = 1;
+    end    
     if exist(offFilePath, 'file')
         offFeatures = load(offFilePath);
         offFeatureSet = offFeatures.featureSet;
     else
-        offFeatureSet = prtDataSetClass();
+        offFeatureSet = prtDataSetClass([], decisionIDs(2));
     end
     
     % Collect Features
     for i = 1:dataLength
         if on(i) == 1
             eventWindow = trainingDataSet(i-trainingWindow:i+trainingWindow);
-            eventFeatures = prtDataSetClass(eventWindow);
-            onFeatureSet = catObservations(onFeatureSet, eventFeatures);
+            onFeatureSet = catObservations(onFeatureSet, eventWindow);
         end
         if off(i) == 1
             eventWindow = trainingDataSet(i-trainingWindow:i+trainingWindow);
-            eventFeatures = prtDataSetClass(eventWindow);
-            offFeatureSet = catObservations(offFeatureSet, eventFeatures);
+            offFeatureSet = catObservations(offFeatureSet, eventWindow);
         end
     end
     
     % Resave features
-    save(onFilePath, onFeatureSet);
-    save(offFilePath, 
-    %save('featureSet', offFilePath);
-    
+    save(onFilePath, 'onFeatureSet');
+    save(offFilePath, 'offFeatureSet');
+
 end

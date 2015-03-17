@@ -1,4 +1,4 @@
-function trainingDisaggregation(trainingDataSet, applianceLabel)
+function trainingDisaggregation(trainingDataSet, applianceLabel, decisionIDs)
 
     dataLength = length(trainingDataSet);
     
@@ -6,42 +6,44 @@ function trainingDisaggregation(trainingDataSet, applianceLabel)
     [on, off, events] = GLR_EventDetection(trainingDataSet,40,30,25,-10,3,0,6);
 
     trainingWindow = 10;
-%     onFilePath = cat(2, applianceLabel, 'OnFeatures.mat');
-%     offFilePath = cat(2, applianceLabel, 'OffFeatures.mat');
     onFilePath = cat(2, applianceLabel, 'OnFeatures');
     offFilePath = cat(2, applianceLabel, 'OffFeatures');
     
     % Load features if exist
+    onExist = 0; offExist = 0;
     if exist(onFilePath, 'file')
         onFeatures = load(onFilePath);
         onFeatureSet = onFeatures.featureSet;
-    else
-        onFeatureSet = prtDataSetClass();
-    end
-    
+        onExist = 1;
+    end    
     if exist(offFilePath, 'file')
         offFeatures = load(offFilePath);
         offFeatureSet = offFeatures.featureSet;
-    else
-        offFeatureSet = prtDataSetClass();
+        offExist = 1;
     end
     
     % Collect Features
     for i = 1:dataLength
         if on(i) == 1
             eventWindow = trainingDataSet(i-trainingWindow:i+trainingWindow);
-            eventFeatures = prtDataSetClass(eventWindow);
-            onFeatureSet = catObservations(onFeatureSet, eventFeatures);
+            if onExist == 1
+                onFeatureSet = catObservations(onFeatureSet, eventWindow);
+            else 
+                onFeatureSet = prtDataSetClass(eventWindow, decisionIDs(1));
+            end
         end
         if off(i) == 1
             eventWindow = trainingDataSet(i-trainingWindow:i+trainingWindow);
-            eventFeatures = prtDataSetClass(eventWindow);
-            offFeatureSet = catObservations(offFeatureSet, eventFeatures);
+            if offExist == 1        
+                offFeatureSet = catObservations(offFeatureSet, eventWindow);
+            else
+                offFeatureSet = prtDataSetClass(eventWindow, decisionIDs(2));
+            end
         end
     end
     
     % Resave features
-    save(onFilePath, onFeatureSet);
-    save(offFilePath, offFeatureSet);
+    save(onFilePath, 'onFeatureSet');
+    save(offFilePath, 'offFeatureSet');
 
 end
