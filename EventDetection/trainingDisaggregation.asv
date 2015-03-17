@@ -42,6 +42,7 @@ function trainingDisaggregation(trainingDataSet, applianceLabel)
     
     % Resave features
     save(onFilePath, onFeatureSet);
-    save(offFilePath, offFeatureSet);
-
+    save(offFilePath, 
+    %save('featureSet', offFilePath);
+    
 end
