@@ -17,11 +17,11 @@ function liveDisaggregation()
      end
 %
      knnClassifierOn = prtClassKnn;
-     knnClassifierOn.k = 8;
+     knnClassifierOn.k = 5;
      knnClassifierOn = knnClassifierOn.train(fullOnSet);
 
      knnClassifierOff = prtClassKnn;
-     knnClassifierOff.k = 8;
+     knnClassifierOff.k = 5;
      knnClassifierOff = knnClassifierOff.train(fullOffSet);
      
     while 1
@@ -36,7 +36,7 @@ function liveDisaggregation()
         % upto 1800).
         % window = 300;
 %        times = liveData(endRow-window:endRow,1);
-        aggregatePower = sum(liveData(:,2:3),2);
+        aggregatePower = sum(liveData(:,2:3),2) - 3700;
         dataLength = length(aggregatePower);
         % Plot
         % refresh
@@ -47,7 +47,7 @@ function liveDisaggregation()
         [on, off, events] = GLR_EventDetection(aggregatePower,20,10,8,-10,3,0,4);
         trainingWindow = 10;
         % Disaggregation
-         for i = (1 + trainingWindow):(dataLength-trainingWindow)
+         for i = (55 + trainingWindow):(dataLength-trainingWindow)
              if on(i) == 1
                  eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
                  eventFeatures = prtDataSetClass(eventWindow);
@@ -67,8 +67,8 @@ function liveDisaggregation()
                  [~, dcsID] = max(knnClassOut.data);
              end
          end
-        print(dcsID)
+        dcsID
         % 1 second pause
-        pause(1)
+        pause(.1)
     end
 end
