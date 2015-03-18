@@ -25,7 +25,7 @@ function trainingDisaggregation(trainingDataSet, applianceLabel, decisionIDs)
     % Collect Features
     for i = 1:dataLength
         if on(i) == 1
-            eventWindow = trainingDataSet(i-trainingWindow:i+trainingWindow)'
+            eventWindow = trainingDataSet(i-trainingWindow:i+trainingWindow)';
             if onExist == 1
                 onFeatureSet = catObservations(onFeatureSet, eventWindow);
             else 
@@ -33,7 +33,7 @@ function trainingDisaggregation(trainingDataSet, applianceLabel, decisionIDs)
             end
         end
         if off(i) == 1
-            eventWindow = trainingDataSet(i-trainingWindow:i+trainingWindow);
+            eventWindow = trainingDataSet(i-trainingWindow:i+trainingWindow)';
             if offExist == 1        
                 offFeatureSet = catObservations(offFeatureSet, eventWindow);
             else
