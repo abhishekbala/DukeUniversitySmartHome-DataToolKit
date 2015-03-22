@@ -10,21 +10,18 @@ function [eventsDetected_on, eventsDetected_off, eventsDetected] = GLR_EventDete
 %                   DEFAULT: 40
 % w_GLRLength ==> Increase or decrease window which we calculate GLR.
 %                   DEFAULT: 30
-% SignalNoiseRatio ==> Determines how strong additive wgn is.
+% SignalNoiseRatio ==> Determines how strong additive wgn is. 
 %                   DEFAULT 1
-% preProcessOption ==> Values 0 to 4.
+% preProcessOption ==> Values 0 to 4. 
 %                    DEFAULT 3: smoothing + additive
-% GLRSmoothingOption ==> Values 0 to 4.
+% GLRSmoothingOption ==> Values 0 to 4. 
 %                   DEFAULT 0: No smoothing
-% ZScoreValue ==> Threshold of transitional importance.
+% ZScoreValue ==> Threshold of transitional importance. 
 %                   DEFAULT 4: 99.99% Noise elminiation
 
 % Timing
 %clock
 
-if(size(data, 1) == 1 && size(data, 2) ~= 1) % Making sure data is in right format
-    data = data';
-end
 
 if(nargin == 1)
     w_BeforeAfterLength = 40;
@@ -39,10 +36,10 @@ end
 %% DETECT EVENTS USING GENERALIZED LIKELIHOOD RATIO
 
 %% Defining Variables
-wa = w_BeforeAfterLength; % Window of the next w_BeforeAfterLength points
-wb = w_BeforeAfterLength; % Window of the previous w_BeforeAfterLength points
+wa = w_BeforeAfterLength; % Window of the next 100 points
+wb = w_BeforeAfterLength; % Window of the previous 100 points
 current = wb; % Initialize the point in which the pointer starts at
-startIndex = current; % Initialize the start index at the w_BeforeAfterLength data point
+startIndex = current; % Initialize the start index at the 100th data point
 wl = w_GLRLength; % Window in which we calculate the GLR
 
 vt = v_Threshold; % Voting threshold
@@ -83,10 +80,8 @@ myDataStats = zeros(4, length(modifiedData));
 
 for i = (1 + wb):(length(modifiedData)-wa)
     xn = modifiedData(i);
-% % % % % %     meana = mean(modifiedData((i+1):(i+wa)));
-% % % % % %     meanb = mean(modifiedData((i-wb):(i-1)));
-    meana = mean(data((i+1):(i+wa)));
-    meanb = mean(data((i-wb):(i-1)));
+    meana = mean(modifiedData((i+1):(i+wa)));
+    meanb = mean(modifiedData((i-wb):(i-1)));
     sigmaa = std(modifiedData((i+1):(i+wa)));
     sigmab = std(modifiedData((i-wb):(i-1)));
     
@@ -95,16 +90,12 @@ for i = (1 + wb):(length(modifiedData)-wa)
     myDataStats(3, i) = sigmaa;
     myDataStats(4, i) = sigmab;
     
-    %    l(i) = - (xn - meana)^2 / (2*sigmaa) + (xn - meanb)^2 / (2*sigmab);
-    %     This code is technically incorrect: Should be the BELOW:
-    
-    l(i) = - (xn - meana).^2 / (2.*sigmaa.^2) + (xn - meanb).^2 / (2.*sigmab.^2 );
-    
+    l(i) = - (xn - meana)^2 / (2*sigmaa) + (xn - meanb)^2 / (2*sigmab);
 end
 %%%%% Smoothing Additive (May Improve Performance)
 switch GLRSmoothingOption
     case 0
-        l = 1.*l; % Do Nothing
+        l = 1.*l;
     case 1
         smooth(l, 'moving');
     case 2
@@ -125,11 +116,13 @@ while startIndex + wl - 1 + wa < length(data) % As long as the GLR window + wind
     end
     
     smaxi = find(s(startIndex : endIndex) == max(s(startIndex : endIndex))); % We want to find the maximum stats value for each window
-    smaxi = startIndex - 1 + smaxi(1);
+    smaxi = startIndex - 1 + smaxi;
     
     %% Transitional Priority:
     % This uses statistical confidence intervals to eliminate votes in
     % which the data point is surrounded by 'noise'
+    
+    
     
     Za = (modifiedData(smaxi) -  myDataStats(1, smaxi))./myDataStats(3, smaxi);
     Zb = (modifiedData(smaxi) -  myDataStats(2, smaxi))./myDataStats(4, smaxi);
@@ -138,17 +131,9 @@ while startIndex + wl - 1 + wa < length(data) % As long as the GLR window + wind
         v(smaxi) = v(smaxi) + 0;
     else
         v(smaxi) = v(smaxi) + 1;
-        % % % %         if(Za > 0)
-        % % % %             v_offEvents(smaxi) = v_offEvents(smaxi) + 1;
-        % % % %         elseif(Za < 0)
-        % % % %             v_onEvents(smaxi) = v_onEvents(smaxi) + 1;
-        % % % %         end
-        %%%%%%%%%%%%%%%%%%%%%% INSTEAD OF THE ABOVE CONDITION: Maybe actually
-        %%%%%%%%%%%%%%%%%%%%%% comparing values after vs before values would give
-        %%%%%%%%%%%%%%%%%%%%%% us a good representation of on vs off.
-        if(modifiedData(smaxi+4) - modifiedData(smaxi - 2) < 0)
+        if(Za > 0)
             v_offEvents(smaxi) = v_offEvents(smaxi) + 1;
-        elseif(modifiedData(smaxi+4) - modifiedData(smaxi - 2) >= 0)
+        elseif(Za < 0)
             v_onEvents(smaxi) = v_onEvents(smaxi) + 1;
         end
     end
