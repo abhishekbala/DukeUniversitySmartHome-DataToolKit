@@ -6,6 +6,7 @@ function liveDisaggregation()
          %cFile = onFiles{iFile};
          load(onFiles{iFile});
          fullOnSet = catObservations(fullOnSet, onFeatureSet);
+         plot(onFeatureSet)
      end
 %     
      offFiles = prtUtilSubDir('OffFeatures','*.mat');
