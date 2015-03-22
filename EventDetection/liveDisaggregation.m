@@ -36,7 +36,7 @@ function liveDisaggregation()
         % upto 1800).
         % window = 300;
 %        times = liveData(endRow-window:endRow,1);
-        aggregatePower = sum(liveData(:,2:3),2) - 3700;
+        aggregatePower = sum(liveData(:,2:3),2);
         dataLength = length(aggregatePower);
         % Plot
         % refresh
@@ -44,7 +44,7 @@ function liveDisaggregation()
 %        plot(times,aggregatePower);
 
         % Event Detection
-        [on, off, events] = GLR_EventDetection(aggregatePower,20,10,8,-10,3,0,4);
+        [on, off, events] = GLR_EventDetection(aggregatePower,20,10,8,0,0,0,4);
         trainingWindow = 10;
         % Disaggregation
          for i = (55 + trainingWindow):(dataLength-trainingWindow)

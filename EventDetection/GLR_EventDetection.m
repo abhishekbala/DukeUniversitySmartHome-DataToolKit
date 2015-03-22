@@ -121,6 +121,9 @@ while startIndex + wl - 1 + wa < length(data) % As long as the GLR window + wind
     %% Transitional Priority:
     % This uses statistical confidence intervals to eliminate votes in
     % which the data point is surrounded by 'noise'
+    
+    
+    
     Za = (modifiedData(smaxi) -  myDataStats(1, smaxi))./myDataStats(3, smaxi);
     Zb = (modifiedData(smaxi) -  myDataStats(2, smaxi))./myDataStats(4, smaxi);
     
@@ -144,14 +147,17 @@ end
 v(v < vt) = 0;
 v(v >= vt) = 1;
 v_scaled = v.*(data');
+v_scaled(v_scaled == 0) = NaN;
 
 v_onEvents(v_onEvents < vt) = 0;
 v_onEvents(v_onEvents >= vt) = 1;
 v_onEvents_scaled = v_onEvents.*(data');
+v_onEvents_scaled(v_onEvents_scaled == 0) = NaN;
 
 v_offEvents(v_offEvents < vt) = 0;
 v_offEvents(v_offEvents >= vt) = 1;
 v_offEvents_scaled = v_offEvents.*(data');
+v_offEvents_scaled(v_offEvents_scaled == 0) = NaN;
 
 eventsDetected = v;
 eventsDetected_on = v_onEvents;
@@ -174,15 +180,15 @@ xlabel('Time Series Values (s)');
 ylabel('Power Values (W)');
 legend('Data', 'Events');
 
-figure(2);
-hold on;
-plot(data);
-plot(v_scaled, 'ro', 'linewidth', 2);
-hold off;
-title('Events detected');
-xlabel('Time Series Values (s)');
-ylabel('Power Values (W)');
-legend('Data', 'Events');
+% figure(2);
+% hold on;
+% plot(data);
+% plot(v_scaled, 'ro', 'linewidth', 2);
+% hold off;
+% title('Events detected');
+% xlabel('Time Series Values (s)');
+% ylabel('Power Values (W)');
+% legend('Data', 'Events');
 
 end
 
