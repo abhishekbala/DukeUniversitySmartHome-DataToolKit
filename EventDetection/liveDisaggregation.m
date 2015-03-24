@@ -24,9 +24,10 @@ function liveDisaggregation()
      knnClassifierOff = prtClassKnn;
      knnClassifierOff.k = 5;
      knnClassifierOff = knnClassifierOff.train(fullOffSet);
-     
+     Pmax = 2;
     while 1
-        
+        Pmax = Pmax - 1;
+        j = Pmax;
         liveData = importdata('../dataCollectors/shData.csv');
         % endRow = length(liveData(:,1));
 
@@ -46,11 +47,11 @@ function liveDisaggregation()
 %        plot(times,aggregatePower);
 
         % Event Detection
-        [on, off, events] = GLR_EventDetection(aggregatePower,20,15,10,-20,1,0,4);
+        [on, off, events] = GLR_EventDetection(aggregatePower(j:dataLength),20,15,10,-20,1,0,4);
         trainingWindow = 10;
         
         % Disaggregation
-         for i = (1 + trainingWindow):(dataLength-trainingWindow)
+         for i = (j + trainingWindow):(dataLength-trainingWindow)
              if on(i) == 1
                  eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
                  eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
@@ -62,7 +63,7 @@ function liveDisaggregation()
                  
                  [~, dcsID] = max(knnClassOut.data);
                  
-                 text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20);
+                 text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
              end
              if off(i) == 1
                  eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
@@ -74,10 +75,11 @@ function liveDisaggregation()
                  
                  [~, dcsID] = max(knnClassOut.data);
                  
-                 text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20);
+                 text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
              end
          end
         dcsID
+        Pmax = max(max(find(on)),max(find(off)));
         % 1 second pause
         pause(1)
     end
