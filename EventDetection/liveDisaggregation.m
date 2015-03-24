@@ -45,12 +45,15 @@ function liveDisaggregation()
 %        plot(times,aggregatePower);
 
         % Event Detection
-        [on, off, events] = GLR_EventDetection(aggregatePower,20,10,8,0,0,0,4);
+        [on, off, events] = GLR_EventDetection(aggregatePower,40,30,25,-10,3,0,6);
         trainingWindow = 10;
         % Disaggregation
-         for i = (55 + trainingWindow):(dataLength-trainingWindow)
+         for i = (1 + trainingWindow):(dataLength-trainingWindow)
              if on(i) == 1
                  eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
+                 eventSlope = polyfit(1:21,eventWindow,1);
+                 eventDelta = max(eventWindow) - min(eventWindow);
+                 eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
                  eventFeatures = prtDataSetClass(eventWindow);
                  
                  knnClassOut = knnClassifierOn.run(eventFeatures);
