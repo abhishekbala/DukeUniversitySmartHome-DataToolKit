@@ -31,6 +31,9 @@ function liveDisaggregation()
      % Creating fixed variables: myOn, myOff, myEvents
      myOn = [];
      myOff = [];
+     myEvents = [];
+     
+     startPointer = 0;
      
      
     while 1
@@ -53,33 +56,20 @@ function liveDisaggregation()
 %        plot(times,aggregatePower);
 
         % Event Detection
-       
-        % This portion updates myOn and myOff by shifting by -1
-        myOn = myOn - 1;
-        myOff = myOff - 1;
-        
-        myOn(myOn == 0) = [];
-        myOff(myOff == 0) = [];
-        
         [on, off, events] = GLR_EventDetection(aggregatePower,20,15,10,-20,1,0,4);
         trainingWindow = 10;
         
         % This section refreshes the event detection properly, ignoring
         % irrelevant points:
-        if(isEmpty(myOn) && isEmpty(myOff)) 
+        if(startPointer == 0) 
             myOn = on;
             myOff = off;
-        else
-            myMaxEventIndex = max([myOn myOff]);
-            on(on <= myMaxEventIndex) = [];
-            off(off <= myMaxEventIndex) = [];
             
-            myOn = [myOn on];
-            myOff = [myOff off];
+            startPointer = 1;
+        else
+            if(isEmpty(myOn) && isEmpty(my))
+            end
         end
-        
-        on = myOn;
-        off = myOff;
         
         % Disaggregation
          for i = (1 + trainingWindow):(dataLength-trainingWindow)
