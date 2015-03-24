@@ -3,14 +3,7 @@ function trainingFeatureExtraction(trainingDataSet, applianceLabel, decisionIDs,
     dataLength = length(trainingDataSet);
     
     % Event Detection
-    a = parameters(1);
-    b = parameters(2);
-    c = parameters(3);
-    d = parameters(4);
-    e = parameters(5);
-    f = parameters(6);
-    g = parameters(7);
-    [on, off, events] = GLR_EventDetection(trainingDataSet, a, b, c, d, e, f, g);
+    [on, off, events] = GLR_EventDetection(trainingDataSet, parameters[1], parameters[2], parameters[3], parameters[4], parameters[5], parameters[6], parameters[);
 
     trainingWindow = 10;
     onFilePath = cat(2, applianceLabel, 'OnFeatures');
