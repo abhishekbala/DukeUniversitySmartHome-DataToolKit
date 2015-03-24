@@ -26,7 +26,8 @@ function liveDisaggregation()
      knnClassifierOff = knnClassifierOff.train(fullOffSet);
      
     while 1
-        liveData = csvread('../dataCollectors/shData.csv');
+        
+        liveData = importdata('../dataCollectors/shData.csv');
         % endRow = length(liveData(:,1));
 
         % Original data
@@ -45,34 +46,39 @@ function liveDisaggregation()
 %        plot(times,aggregatePower);
 
         % Event Detection
-        [on, off, events] = GLR_EventDetection(aggregatePower,40,30,25,-10,3,0,6);
+        [on, off, events] = GLR_EventDetection(aggregatePower,20,15,10,-20,1,0,4);
         trainingWindow = 10;
+        
         % Disaggregation
          for i = (1 + trainingWindow):(dataLength-trainingWindow)
              if on(i) == 1
                  eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
-                 eventSlope = polyfit(1:21,eventWindow,1);
+                 eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
                  eventDelta = max(eventWindow) - min(eventWindow);
                  eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
-                 eventFeatures = prtDataSetClass(eventWindow);
+                 %eventFeatures = prtDataSetClass(eventWindow);
                  
                  knnClassOut = knnClassifierOn.run(eventFeatures);
                  
                  [~, dcsID] = max(knnClassOut.data);
                  
-                 
+                 text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20);
              end
              if off(i) == 1
                  eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
-                 eventFeatures = prtDataSetClass(eventWindow);
-                 
+                 %eventFeatures = prtDataSetClass(eventWindow);
+                 eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
+                 eventDelta = max(eventWindow) - min(eventWindow);
+                 eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
                  knnClassOut = knnClassifierOff.run(eventFeatures);
                  
                  [~, dcsID] = max(knnClassOut.data);
+                 
+                 text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20);
              end
          end
         dcsID
         % 1 second pause
-        pause(.1)
+        pause(1)
     end
 end
