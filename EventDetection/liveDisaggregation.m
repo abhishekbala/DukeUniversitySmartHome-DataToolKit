@@ -8,7 +8,7 @@ function liveDisaggregation()
          fullOnSet = catObservations(fullOnSet, onFeatureSet);
          plot(onFeatureSet)
      end
-%     
+%    
      offFiles = prtUtilSubDir('OffFeatures','*.mat');
      fullOffSet = prtDataSetClass();
      for iFile = 1:length(offFiles)
