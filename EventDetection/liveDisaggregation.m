@@ -1,5 +1,6 @@
 function liveDisaggregation()
 
+% Loading On Files
 onFiles = prtUtilSubDir('OnFeatures','*.mat');
 fullOnSet = prtDataSetClass();
 for iFile = 1:length(onFiles)
@@ -8,7 +9,8 @@ for iFile = 1:length(onFiles)
     fullOnSet = catObservations(fullOnSet, onFeatureSet);
     plot(onFeatureSet)
 end
-%
+
+% Loading Off Files
 offFiles = prtUtilSubDir('OffFeatures','*.mat');
 fullOffSet = prtDataSetClass();
 for iFile = 1:length(offFiles)
@@ -39,8 +41,12 @@ end
 
 myOn = zeros(size(aggregatePower));
 myOff = zeros(size(aggregatePower));
+myEvents = zeros(size(aggregatePower));
 
+% Indicator of 1st loop:
+myIndicator = 0;
 
+% Main Loop: 
 while 1
     liveData = importdata('../dataCollectors/shData.csv');
     
@@ -50,10 +56,12 @@ while 1
     if (length(myOn) < dataLength)
         myOn(dataLength) = 0; % Matlab code automatically fills in zeros in between
         myOff(dataLength) = 0;
+        myEvents(dataLength) = 0;
     elseif (length(myOn) > dataLength)
         delta = length(myOn) - dataLength;
         myOn(1:delta) = []; % Truncates data based on python
         myOff(1:delta) = [];
+        myEvents(1:delta) = [];
     end
     
     % Event Detection
@@ -69,7 +77,21 @@ while 1
         myMax = 0;
     end
     
-    [on, off, events] = GLR_EventDetection(aggregatePower,20,15,10,-20,1,0,4);
+    if(myIndicator == 0)
+        [on, off, events] = GLR_EventDetection(aggregatePower,20,15,10,-20,1,0,4);
+        myIndicator = 1;
+    else
+        dataSampleLength = dataLength - myMax;
+        prev_On = myOn(1:myMax);
+        prev_Off = myOff(1:myMax);
+        prev_Events = myEvents(1:myMax);
+        
+        [on, off, events] = GLR_EventDetection(aggregatePower((myMax+1):dataLength),20,15,10,-20,1,0,4);
+        
+        on = [prev_On' on];
+        off = [prev_Off' off];
+        events = [prev_Events' events];
+    end
     trainingWindow = 10;
     
     GLRMax = find(events == 1, 1, 'last');
@@ -119,7 +141,7 @@ while 1
             
             fprintf('%1.0f is the appliance ON at time %5.3f \n', dcsID, i);
             
-            % The below code works while live
+            % The below code works while live:
             % text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
         end
         if off(i) == 1
@@ -134,13 +156,12 @@ while 1
             
             fprintf('%1.0f is the appliance OFF at time %5.3f \n', dcsID, i);
             
-            % The below code works while live
+            % The below code works while live:
             % text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
         end
     end
-    %dcsID
-    %Pmax = max(max(find(on)),max(find(off)));
+
     % 1 second pause
-    pause(1)
+     pause(0.1)
 end
 end
