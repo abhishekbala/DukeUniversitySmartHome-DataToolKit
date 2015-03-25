@@ -16,6 +16,7 @@ for iFile = 1:length(offFiles)
     load(offFiles{iFile});
     fullOffSet = catObservations(fullOffSet, offFeatureSet);
 end
+
 %
 knnClassifierOn = prtClassKnn;
 knnClassifierOn.k = 5;
