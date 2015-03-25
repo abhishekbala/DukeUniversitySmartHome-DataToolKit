@@ -1,5 +1,10 @@
 function liveDisaggregation()
 
+% Create figures to call later
+figure1 = figure(1);
+figure1.WindowStyle = 'docked';
+drawnow;
+
 % Loading On Files
 onFiles = prtUtilSubDir('OnFeatures','*.mat');
 fullOnSet = prtDataSetClass();
@@ -122,9 +127,8 @@ while (~FS.Stop())
     
     % Plotting
     clf; % Clear Relevant Figures
-   
-    
-    figure(1);
+    % Call Figure 1 and update without stealing focus
+    changeFigure(figure1);
     hold on;
     plot(aggregatePower);
     plotMyOn = myOn;
