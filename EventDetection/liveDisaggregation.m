@@ -1,8 +1,8 @@
 function liveDisaggregation()
 
 % Create figures to call later
-figure1 = figure(1);
-figure1.WindowStyle = 'docked';
+figure1 = figure('CloseRequestFcn',@figureCloseReq);
+%figure1.WindowStyle = 'docked';
 drawnow;
 
 % Loading On Files
@@ -53,6 +53,10 @@ myIndicator = 0;
 
 % Create a stop loop:
 FS = stoploop({'Click me to:', 'Exit out of the Loop'});
+
+% Create vector storing Appliance IDs for every event
+onLabels = [];
+offLabels = [];
 
 % Main Loop: 
 while (~FS.Stop())
@@ -159,6 +163,8 @@ while (~FS.Stop())
             
             fprintf('%1.0f is the appliance ON at time %5.3f \n', dcsID, i);
             
+            onLabels = [onLabels dcsID];
+            
             % The below code works while live:
             % text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
         end
@@ -173,6 +179,8 @@ while (~FS.Stop())
             [~, dcsID] = max(knnClassOut.data);
             
             fprintf('%1.0f is the appliance OFF at time %5.3f \n', dcsID, i);
+            
+            offLabels = [offLabels dcsID];
             
             % The below code works while live:
             % text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
