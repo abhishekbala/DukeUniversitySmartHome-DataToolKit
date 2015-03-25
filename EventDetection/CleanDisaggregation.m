@@ -1,25 +1,14 @@
-function liveDisaggregation()
+function CleanDisaggregation()
+%CLEANDISAGGREGATION A Live Disaggregation Method
+%   A real-time event detection and classification method for appliances
+%   obtaining data fed in from a python script.
 
-% Loading On Files
-onFiles = prtUtilSubDir('OnFeatures','*.mat');
-fullOnSet = prtDataSetClass();
-for iFile = 1:length(onFiles)
-    %cFile = onFiles{iFile};
-    load(onFiles{iFile});
-    fullOnSet = catObservations(fullOnSet, onFeatureSet);
-    %plot(onFeatureSet)
-end
+[~, fullOnSet] = loadOnFiles();
 
-% Loading Off Files
-offFiles = prtUtilSubDir('OffFeatures','*.mat');
-fullOffSet = prtDataSetClass();
-for iFile = 1:length(offFiles)
-    %cFile = offFiles{iFile};
-    load(offFiles{iFile});
-    fullOffSet = catObservations(fullOffSet, offFeatureSet);
-end
+[~, fullOffSet] = loadOffFiles();
 
-%
+%trainKNNClassifier
+
 knnClassifierOn = prtClassKnn;
 knnClassifierOn.k = 5;
 knnClassifierOn = knnClassifierOn.train(fullOnSet);
@@ -27,11 +16,9 @@ knnClassifierOn = knnClassifierOn.train(fullOnSet);
 knnClassifierOff = prtClassKnn;
 knnClassifierOff.k = 5;
 knnClassifierOff = knnClassifierOff.train(fullOffSet);
-Pmax = 2;
-dcsID = 0;
 
+% Loading and Manipulating Data
 
-% Creating fixed variables: myOn, myOff, myEvents
 liveData = importdata('../dataCollectors/shData.csv');
 aggregatePower = sum(liveData(:,2:3),2);
 
@@ -49,7 +36,7 @@ myIndicator = 0;
 % Create a stop loop:
 FS = stoploop({'Click me to:', 'Exit out of the Loop'});
 
-% Main Loop: 
+%% Main Loop:
 while (~FS.Stop())
     liveData = importdata('../dataCollectors/shData.csv');
     
@@ -121,64 +108,94 @@ while (~FS.Stop())
     end
     
     % Plotting
-    clf; % Clear Relevant Figures
-   
-    
-    figure(1);
-    hold on;
-    plot(aggregatePower);
-    plotMyOn = myOn;
-    plotMyOff = myOff;
-    plotMyOn(plotMyOn == 0) = NaN;
-    plotMyOff(plotMyOff == 0) = NaN;
-    plot(plotMyOn.*aggregatePower, 'ro', 'linewidth', 2);
-    plot(plotMyOff.*aggregatePower, 'go', 'linewidth', 2);
-    hold off;
-    title('Events detected');
-    xlabel('Time Series Values (s)');
-    ylabel('Power Values (W)');
-    legend('Data', 'On Events', 'Off Events');
+    PlotGraphs(myOn, myOff, aggregatePower);
     
     % Disaggregation
     for i = (1 + trainingWindow):(dataLength-trainingWindow)
         
         if onDummy(i) == 1
-            eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
-            eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
-            eventDelta = max(eventWindow) - min(eventWindow);
-            eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
-            %eventFeatures = prtDataSetClass(eventWindow);
-            
-            knnClassOut = knnClassifierOn.run(eventFeatures);
+            knnClassOut = DisagClassifier(aggregatePower, knnClassifierOn, i, trainingWindow);
             
             [~, dcsID] = max(knnClassOut.data);
             
+            % Printing Out Appliance Classification
             fprintf('%1.0f is the appliance ON at time %5.3f \n', dcsID, i);
             
-            % The below code works while live:
+            % Labeling of Graph
             % text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
-        end
-        if offDummy(i) == 1
-            eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
-            %eventFeatures = prtDataSetClass(eventWindow);
-            eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
-            eventDelta = max(eventWindow) - min(eventWindow);
-            eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
-            knnClassOut = knnClassifierOff.run(eventFeatures);
+        elseif offDummy(i) == 1
+            knnClassOut = DisagClassifier(aggregatePower, knnClassifierOff, i, trainingWindow);
             
             [~, dcsID] = max(knnClassOut.data);
             
+            % Printing Out Appliance Classification
             fprintf('%1.0f is the appliance OFF at time %5.3f \n', dcsID, i);
             
-            % The below code works while live:
+            % Labeling of Graph
             % text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
         end
     end
-
+    
     % 1 second pause
-     pause(1)
+    pause(1)
 end
 
+% Clear the Button
 FS.Clear();
 clear FS;
+end
+
+%% Functions
+
+function [onFiles, fullOnSet] = loadOnFiles()
+onFiles = prtUtilSubDir('OnFeatures','*.mat');
+fullOnSet = prtDataSetClass();
+
+for iFile = 1:length(onFiles)
+    %cFile = onFiles{iFile};
+    load(onFiles{iFile});
+    fullOnSet = catObservations(fullOnSet, onFeatureSet);
+end
+
+end
+
+function [offFiles, fullOffSet] = loadOffFiles()
+offFiles = prtUtilSubDir('OffFeatures','*.mat');
+fullOffSet = prtDataSetClass();
+
+for iFile = 1:length(offFiles)
+    %cFile = offFiles{iFile};
+    load(offFiles{iFile});
+    fullOffSet = catObservations(fullOffSet, offFeatureSet);
+end
+
+end
+
+function PlotGraphs(myOn, myOff, aggregatePower)
+clf; % Clear Relevant Figures
+
+figure(1);
+hold on;
+plot(aggregatePower);
+plotMyOn = myOn;
+plotMyOff = myOff;
+plotMyOn(plotMyOn == 0) = NaN;
+plotMyOff(plotMyOff == 0) = NaN;
+plot(plotMyOn.*aggregatePower, 'ro', 'linewidth', 2);
+plot(plotMyOff.*aggregatePower, 'go', 'linewidth', 2);
+hold off;
+title('Events detected');
+xlabel('Time Series Values (s)');
+ylabel('Power Values (W)');
+legend('Data', 'On Events', 'Off Events');
+end
+
+function [knnClassOut] = DisagClassifier(aggregatePower, knnClassifier, n, trainingWindow)
+eventWindow = aggregatePower(n-trainingWindow:n+trainingWindow)';
+eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
+eventDelta = max(eventWindow) - min(eventWindow);
+eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
+%eventFeatures = prtDataSetClass(eventWindow);
+
+knnClassOut = knnClassifier.run(eventFeatures);
 end
