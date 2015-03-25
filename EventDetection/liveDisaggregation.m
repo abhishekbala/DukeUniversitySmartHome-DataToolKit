@@ -1,5 +1,10 @@
 function liveDisaggregation()
 
+% Create figures to call later
+figure1 = figure('CloseRequestFcn',@figureCloseReq);
+%figure1.WindowStyle = 'docked';
+drawnow;
+
 % Loading On Files
 onFiles = prtUtilSubDir('OnFeatures','*.mat');
 fullOnSet = prtDataSetClass();
@@ -48,6 +53,10 @@ myIndicator = 0;
 
 % Create a stop loop:
 FS = stoploop({'Click me to:', 'Exit out of the Loop'});
+
+% Create vector storing Appliance IDs for every event
+onLabels = [];
+offLabels = [];
 
 % Main Loop: 
 while (~FS.Stop())
@@ -122,9 +131,8 @@ while (~FS.Stop())
     
     % Plotting
     clf; % Clear Relevant Figures
-   
-    
-    figure(1);
+    % Call Figure 1 and update without stealing focus
+    changeFigure(figure1);
     hold on;
     plot(aggregatePower);
     plotMyOn = myOn;
@@ -155,6 +163,8 @@ while (~FS.Stop())
             
             fprintf('%1.0f is the appliance ON at time %5.3f \n', dcsID, i);
             
+            onLabels = [onLabels dcsID];
+            
             % The below code works while live:
             % text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
         end
@@ -170,6 +180,8 @@ while (~FS.Stop())
             
             fprintf('%1.0f is the appliance OFF at time %5.3f \n', dcsID, i);
             
+            offLabels = [offLabels dcsID];
+            
             % The below code works while live:
             % text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
         end
@@ -178,7 +190,8 @@ while (~FS.Stop())
     % 1 second pause
      pause(1)
 end
-
 FS.Clear();
 clear FS;
+onLabels
+offLabels
 end
