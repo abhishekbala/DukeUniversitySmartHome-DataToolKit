@@ -50,9 +50,16 @@ while 1
     % window = 300;
     %        times = liveData(endRow-window:endRow,1);
     
+    
     aggregatePower = sum(liveData(:,2:3),2);
     dataLength = length(aggregatePower);
     
+    if (length(myOn) < dataLength)
+        myOn(length(myOn)+1:dataLength) = 0;
+    end
+    if (length(myOff) < dataLength)
+        myOff(length(myOff)+1:dataLength) = 0;
+    end
     % Plot
     % refresh
     %        figure(1);
@@ -113,11 +120,6 @@ while 1
     ylabel('Power Values (W)');
     legend('Data', 'Events');
     
-    
-    
-    
-    
-    
     % Disaggregation
     for i = (1 + trainingWindow):(dataLength-trainingWindow)
         
@@ -134,7 +136,7 @@ while 1
             
             fprintf('%1.0f is the appliance ON at time %5.3f \n', dcsID, i);
             
-            %text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
+            text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
         end
         if off(i) == 1
             eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
@@ -148,7 +150,7 @@ while 1
             
             fprintf('%1.0f is the appliance OFF at time %5.3f \n', dcsID, i);
             
-            %text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
+            text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
         end
     end
     %dcsID
