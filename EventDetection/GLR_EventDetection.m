@@ -182,18 +182,18 @@ eventsDetected_off = v_offEvents;
 %clock
 
 %% Plotting Relevant Features
-clf; % Clear Relevant Figures
-
-figure(1);
-hold on;
-plot(data);
-plot(v_onEvents_scaled, 'ro', 'linewidth', 2);
-plot(v_offEvents_scaled, 'go', 'linewidth', 2);
-hold off;
-title('Events detected');
-xlabel('Time Series Values (s)');
-ylabel('Power Values (W)');
-legend('Data', 'Events');
+% % % % % % clf; % Clear Relevant Figures
+% % % % % % 
+% % % % % % figure(1);
+% % % % % % hold on;
+% % % % % % plot(data);
+% % % % % % plot(v_onEvents_scaled, 'ro', 'linewidth', 2);
+% % % % % % plot(v_offEvents_scaled, 'go', 'linewidth', 2);
+% % % % % % hold off;
+% % % % % % title('Events detected');
+% % % % % % xlabel('Time Series Values (s)');
+% % % % % % ylabel('Power Values (W)');
+% % % % % % legend('Data', 'Events');
 
 % figure(2);
 % hold on;
