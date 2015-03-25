@@ -95,7 +95,7 @@ function liveDisaggregation()
                  
                    [~, dcsID] = max(knnClassOut.data);
                     
-                   fprintf('%1.0f is the appliance ON at time %5.3f \n', dcsID, i);
+                   sprintf('%1.0f is the appliance ON at time %5.3f', dcsID, i);
                    
                    %text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
                 end
@@ -109,7 +109,7 @@ function liveDisaggregation()
                  
                     [~, dcsID] = max(knnClassOut.data);
                     
-                    fprintf('%1.0f is the appliance OFF at time %5.3f \n', dcsID, i);
+                    disp(sprintf('%1.0f is the appliance OFF at time %5.3f', dcsID, i);
                     
                     %text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
                 end
