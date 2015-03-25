@@ -81,7 +81,7 @@ while (~FS.Stop())
     end
     
     if(myIndicator == 0)
-        [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower,20,15,10,-20,1,0,4);
+        [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower,80,15,10,-20,1,0,4);
         on = onDummy;
         off = offDummy;
         events = eventsDummy;
@@ -92,7 +92,7 @@ while (~FS.Stop())
         prev_Off = myOff(1:myMax);
         prev_Events = myEvents(1:myMax);
         
-        [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower((myMax+1):dataLength),20,15,10,-20,1,0,4);
+        [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower((myMax+1):dataLength),80,15,10,-20,1,0,4);
         
         on = [prev_On' onDummy];
         off = [prev_Off' offDummy];
