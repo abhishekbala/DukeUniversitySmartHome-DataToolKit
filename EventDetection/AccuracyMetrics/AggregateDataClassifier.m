@@ -1,8 +1,12 @@
-function [ device_Qi_On device_Qi_Off ] = Class( data, times, parameters, deviceOnID, deviceOffID )
+function [ device_Qi_OnTimes, device_Qi_OffTimes, device_Qi_EventTimes ] = Class( data, times, parameters, deviceOnID, deviceOffID )
 %CLASS Summary of this function goes here
 %   Detailed explanation goes here
 
 %% Steps needed: 
+
+%%% READ THIS! KEY STEP: I AM ASSUMING deviceOffID = deviceOnID + 0.5 for
+%%% a single appliance comparing states.
+
 
 % Input: (data, times, parameters , deviceName)
 % Output: [device_Qi_ON, device_Qi_OFF]
@@ -37,8 +41,10 @@ end
 
 %% This section performs Disaggregation & returns a 1 x length(Data): 
 
-
-
+[ ONdcsID, OFFdcsID, TOTdcsID ] = FullDisaggregation( data, parameters );
+device_Qi_OnTimes = times(ONdcsID == deviceOnID);
+device_Qi_OffTimes = times(OFFdcsID == deviceOffID);
+device_Qi_EventTimes = sort([device_Qi_OnTimes, device_Qi_OffTimes]);
 
 end
 

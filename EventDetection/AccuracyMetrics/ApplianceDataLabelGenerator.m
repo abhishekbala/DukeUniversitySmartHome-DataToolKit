@@ -1,4 +1,4 @@
-function [onTimes offTimes eventTimes] = ApplianceDataLabelGenerator(data, time, parameters)
+function [onTimes, offTimes, eventTimes] = ApplianceDataLabelGenerator(data, time, parameters)
 %% Parameters
 % Output: onTimes => Array of time values for when events turn on.
 %         offTimes => Array of time values for when events turn off.
