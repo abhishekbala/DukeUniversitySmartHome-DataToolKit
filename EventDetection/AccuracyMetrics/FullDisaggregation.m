@@ -1,4 +1,4 @@
-function [ myDCIDs ] = FullDisaggregation( data, parameters )
+function [ ONdcsID, OFFdcsID, TOTdcsID ] = FullDisaggregation( data, parameters )
 %FULLDISAGGREGATION takes in a data set an GLR parameters and
 %disaggregates on the data set.
 %   data ==> should be a 1 x N or N x 1 vector of data.
@@ -26,15 +26,49 @@ if(size(aggregatePower, 1) ~= 1 && size(aggregatePower, 2) == 1)
     aggregatePower = aggregatePower';
 end
 
-myOn = zeros(size(aggregatePower));
-myOff = zeros(size(aggregatePower));
-myEvents = zeros(size(aggregatePower));
-
 %% Main Part of Function
 dataLength = length(aggregatePower);
 [myOn, myOff, myEvents] = GLR_EventDetection(aggregatePower, parameters);
 
 trainingWindow = 10;
+
+% The below line makes two vectors which, when the classification ends,
+% ideally the the on events will correspond to their specific dcIDs and so
+% will the off events
+
+ONdcsID = zeros(1, dataLength);
+OFFdcsID = zeros(1, dataLength);
+
+for i = (1 + trainingWindow):(dataLength-trainingWindow)
+    
+    if myOn(i) == 1
+        knnClassOut = DisagClassifier(aggregatePower, knnClassifierOn, i, trainingWindow);
+        
+        [~, dcsID] = max(knnClassOut.data);
+        
+        % Printing Out Appliance Classification
+        ONdcsID(i) = dcsID; % Classifies the ith detected on-event
+
+    elseif myOff(i) == 1
+        knnClassOut = DisagClassifier(aggregatePower, knnClassifierOff, i, trainingWindow);
+        
+        [~, dcsID] = max(knnClassOut.data);
+        
+        % Printing Out Appliance Classification
+        OFFdcsID(i) = dcsID; % Classifies the ith detected off-event
+    end
+end
+
+%% Post Processing:
+% This post processing operates under the assumption that:
+% 1. Labels are formatted as follows:
+% On events for specific appliances having decision ID q means that
+% Off events for the same appliance has a decision ID of q + 0.5.
+
+% 2. For each element i in both ONdcsID and OFFdcsID, either both are 0,
+% ONdcsID(i) is nonzero (OFFdcsID(i) is 0), or OFFdcsID(i) is nonzero (ONdcsID(I) is 0)  
+OFFdcsID = OffdcsID + 0.5;
+TOTdcsID = ONdcsID + OFFdcsID;
 
 end
 
@@ -65,3 +99,4 @@ eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
 %eventFeatures = prtDataSetClass(eventWindow);
 
 knnClassOut = knnClassifier.run(eventFeatures);
+end
