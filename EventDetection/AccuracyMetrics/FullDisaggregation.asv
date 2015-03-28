@@ -32,9 +32,7 @@ myEvents = zeros(size(aggregatePower));
 
 %% Main Part of Function
 dataLength = length(aggregatePower);
-[myOn, myOff, myEvents] = GLR_EventDetection(aggregatePower, parameters);
-
-trainingWindow = 10;
+myOn = 
 
 end
 
