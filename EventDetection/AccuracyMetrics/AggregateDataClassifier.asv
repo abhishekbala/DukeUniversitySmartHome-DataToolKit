@@ -1,8 +1,18 @@
-function [ device_Qi_On device_Qi_Off ] = Class( data, times, parameters, deviceOnID, deviceOffID )
+function [ device_Qi_On device_Qi_Off ] = Class( data, times, parameters, deviceName )
 %CLASS Summary of this function goes here
 %   Detailed explanation goes here
 
 %% Steps needed: 
+
+%% Input check:
+
+if nargin ~= 4
+    error('Need 4 input arguments')
+elseif size(data) ~= size(times)
+    error('Data and time vectors need to be the same size')
+elseif 
+end
+
 
 % Input: (data, times, parameters , deviceName)
 % Output: [device_Qi_ON, device_Qi_OFF]
@@ -26,16 +36,6 @@ function [ device_Qi_On device_Qi_Off ] = Class( data, times, parameters, device
 %       device_Qi_ON = [9.3e9, 9.316e9];
 %       device_Qi_OFF = [9.31e9, 9.324e9];
 %RETURN
-
-%% Input check:
-
-if nargin ~= 5
-    error('Need 4 input arguments');
-elseif size(data) ~= size(times)
-    error('Data and time vectors need to be the same size');
-end
-
-%% This section performs Disaggregation & returns a 1 x length(Data): 
 
 
 
