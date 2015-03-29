@@ -47,4 +47,3 @@ device_Qi_OffTimes = times(OFFdcsID == deviceOffID);
 device_Qi_EventTimes = sort([device_Qi_OnTimes, device_Qi_OffTimes]);
 
 end
-
