@@ -1,4 +1,4 @@
-function [ device_Qi_OnTimes, device_Qi_OffTimes, device_Qi_EventTimes ] = Class( data, times, parameters, deviceOnID, deviceOffID )
+function [ device_Qi_OnTimes, device_Qi_OffTimes, device_Qi_EventTimes ] = AggregateDataClassifier( data, times, parameters, deviceOnID, deviceOffID )
 %CLASS Summary of this function goes here
 %   Detailed explanation goes here
 
