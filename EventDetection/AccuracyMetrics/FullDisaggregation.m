@@ -6,9 +6,24 @@ function [ ONdcsID, OFFdcsID, TOTdcsID ] = FullDisaggregation( data, parameters 
 %       [w_BeforeAfterLength, w_GLRLength, v_Threshold, SignalNoiseRatio
 %       preProcessOption, GLRSmoothingOption, ZScoreValue]
 
-[~, fullOnSet] = loadOnFiles();
+% Loading On Files
+onFiles = prtUtilSubDir('OnFeatures','*.mat');
+fullOnSet = prtDataSetClass();
+for iFile = 1:length(onFiles)
+    %cFile = onFiles{iFile};
+    load(onFiles{iFile});
+    fullOnSet = catObservations(fullOnSet, onFeatureSet);
+    %plot(onFeatureSet)
+end
 
-[~, fullOffSet] = loadOffFiles();
+% Loading Off Files
+offFiles = prtUtilSubDir('OffFeatures','*.mat');
+fullOffSet = prtDataSetClass();
+for iFile = 1:length(offFiles)
+    %cFile = offFiles{iFile};
+    load(offFiles{iFile});
+    fullOffSet = catObservations(fullOffSet, offFeatureSet);
+end
 
 %trainKNNClassifier
 
@@ -28,7 +43,7 @@ end
 
 %% Main Part of Function
 dataLength = length(aggregatePower);
-[myOn, myOff, myEvents] = GLR_EventDetection(aggregatePower, parameters);
+[myOn, myOff, myEvents] = GLR_EventDetection(aggregatePower, parameters(1), parameters(2), parameters(3), parameters(4), parameters(5), parameters(6), parameters(7));
 
 trainingWindow = 10;
 
@@ -67,7 +82,7 @@ end
 
 % 2. For each element i in both ONdcsID and OFFdcsID, either both are 0,
 % ONdcsID(i) is nonzero (OFFdcsID(i) is 0), or OFFdcsID(i) is nonzero (ONdcsID(I) is 0)  
-OFFdcsID = OffdcsID + 0.5;
+OFFdcsID = OFFdcsID + 0.5;
 TOTdcsID = ONdcsID + OFFdcsID;
 
 end
@@ -92,7 +107,7 @@ legend('Data', 'On Events', 'Off Events');
 end
 
 function [knnClassOut] = DisagClassifier(aggregatePower, knnClassifier, n, trainingWindow)
-eventWindow = aggregatePower(n-trainingWindow:n+trainingWindow)';
+eventWindow = aggregatePower(n-trainingWindow:n+trainingWindow);
 eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
 eventDelta = max(eventWindow) - min(eventWindow);
 eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
