@@ -9,12 +9,13 @@ import time
 import csv
 import pymysql.cursors
 unixEndTime = 1427595469
-unixStartTime = 1427595469 - (6/24)*86400
+unixStartTime = unixEndTime - (1)*86400
 
+# print command just for visualising script run.
+#print "New Data to be loaded"
 # Get the current SYSTEM unix time. !!MAKE SURE TO CALIBRATE CLOCK!!
 # There is a 51 second lag in the MySQL data.
 # Setup connection to MySQL database
-
 connection=pymysql.connect(
 	host='67.159.81.86',user='student',
 	passwd='bassconnex',db='energydata',
@@ -34,8 +35,9 @@ ORDER BY smarthome.timestamp ASC")
 # Store the 1 second data locally.
 shData = [row for row in cursor]
 # Store in csv (append).
-with open("shOct2015.csv",'wb') as csvOut:
+with open("shMar2015.csv",'wb') as csvOut:
 	csvwriter = csv.writer(csvOut,delimiter=',',dialect='excel')
 	csvwriter.writerows(shData)
+
 cursor.close()
 connection.close()

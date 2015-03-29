@@ -8,7 +8,8 @@ function [onTimes, offTimes, eventTimes] = ApplianceDataLabelGenerator(data, tim
 % Time => time values corresponding to data
 % parameters => array of GLR parameters
 
-[on off events] = GLR_EventDetection(data, parameters);
+
+[on off events] = GLR_EventDetection(data, parameters(1), parameters(2), parameters(3), parameters(4), parameters(5), parameters(6), parameters(7));
 
 onIndices = find(on == 1);
 offIndices = find(off == 1);
