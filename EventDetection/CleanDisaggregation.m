@@ -20,7 +20,8 @@ knnClassifierOff = knnClassifierOff.train(fullOffSet);
 % Loading and Manipulating Data
 
 liveData = importdata('../dataCollectors/shData.csv');
-aggregatePower = sum(liveData(:,2:3),2);
+aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5);
+timestamp = liveData(:,1);
 
 if(size(aggregatePower, 1) == 1 && size(aggregatePower, 2) ~= 1) % Making sure data is in right format
     aggregatePower = aggregatePower';
@@ -39,10 +40,10 @@ FS = stoploop({'Click me to:', 'Exit out of the Loop'});
 %% Main Loop:
 while (~FS.Stop())
     liveData = importdata('../dataCollectors/shData.csv');
-    
+
     aggregatePower = sum(liveData(:,2:3),2);
     dataLength = length(aggregatePower);
-    
+
     if (length(myOn) < dataLength)
         myOn(dataLength) = 0; % Matlab code automatically fills in zeros in between
         myOff(dataLength) = 0;
@@ -53,20 +54,20 @@ while (~FS.Stop())
         myOff(1:delta) = [];
         myEvents(1:delta) = [];
     end
-    
+
     % Event Detection
-    
+
     % Max-Min Manipulations
-    
+
     maxOn = find(myOn == 1, 1, 'last' );
     maxOff = find(myOff == 1, 1, 'last');
-    
+
     myMax = max([maxOn maxOff]);
-    
+
     if(isempty(myMax))
         myMax = 0;
     end
-    
+
     if(myIndicator == 0)
         [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower,20,15,10,-20,1,0,4);
         on = onDummy;
@@ -78,64 +79,64 @@ while (~FS.Stop())
         prev_On = myOn(1:myMax);
         prev_Off = myOff(1:myMax);
         prev_Events = myEvents(1:myMax);
-        
+
         [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower((myMax+1):dataLength),20,15,10,-20,1,0,4);
-        
+
         on = [prev_On' onDummy];
         off = [prev_Off' offDummy];
         events = [prev_Events' eventsDummy];
-        
+
         onDummy = [zeros(1, myMax) onDummy];
         offDummy = [zeros(1, myMax) offDummy];
         eventsDummy = [zeros(1, myMax) eventsDummy];
     end
     trainingWindow = 10;
-    
+
     GLRMax = find(events == 1, 1, 'last');
-    
+
     if(isempty(GLRMax))
         GLRMax = 0;
     end
-    
+
     % This section refreshes the event detection properly, ignoring
     % irrelevant points:
     if(GLRMax > myMax)
         on(1:maxOn) = 0;
         off(1:maxOff) = 0;
-        
+
         myOn = myOn + on';
         myOff = myOff + off';
     end
-    
+
     % Plotting
     PlotGraphs(myOn, myOff, aggregatePower);
-    
+
     % Disaggregation
     for i = (1 + trainingWindow):(dataLength-trainingWindow)
-        
+
         if onDummy(i) == 1
             knnClassOut = DisagClassifier(aggregatePower, knnClassifierOn, i, trainingWindow);
-            
+
             [~, dcsID] = max(knnClassOut.data);
-            
+
             % Printing Out Appliance Classification
             fprintf('%1.0f is the appliance ON at time %5.3f \n', dcsID, i);
-            
+
             % Labeling of Graph
             % text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
         elseif offDummy(i) == 1
             knnClassOut = DisagClassifier(aggregatePower, knnClassifierOff, i, trainingWindow);
-            
+
             [~, dcsID] = max(knnClassOut.data);
-            
+
             % Printing Out Appliance Classification
             fprintf('%1.0f is the appliance OFF at time %5.3f \n', dcsID, i);
-            
+
             % Labeling of Graph
             % text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
         end
     end
-    
+
     % 1 second pause
     pause(1)
 end

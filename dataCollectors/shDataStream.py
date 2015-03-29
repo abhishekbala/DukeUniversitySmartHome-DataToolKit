@@ -25,7 +25,8 @@ while 1:
     # Query the MySQL database.
     # 1 second worth of data from 5 minutes prior from current time is loaded.
     cursor.execute("SELECT smarthome.timestamp,	smarthome.b7139_01_r_01_phase1 \
-    , smarthome.b7139_01_r_02_phase2 FROM energydata.smarthome \
+    , smarthome.b7139_01_r_02_phase2, smarthome.b7139_01_r_03_solar1 \
+    , smarthome.b7139_01_r_04_solar2	FROM energydata.smarthome \
     WHERE smarthome.timestamp =" +unixTime+ " \
     ORDER BY smarthome.timestamp ASC")
     # Store the 1 second data locally.
