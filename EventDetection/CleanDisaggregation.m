@@ -20,7 +20,7 @@ knnClassifierOff = knnClassifierOff.train(fullOffSet);
 % Loading and Manipulating Data
 
 liveData = importdata('../dataCollectors/shData.csv');
-aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5);
+aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
 timestamp = liveData(:,1);
 
 if(size(aggregatePower, 1) == 1 && size(aggregatePower, 2) ~= 1) % Making sure data is in right format

@@ -1,0 +1,7 @@
+plot(h10OnFeatures(:,1),h10OnFeatures(:,2), '.', 'MarkerSize', 5)
+hold on; plot(hotOnFeatures(:,1),hotOnFeatures(:,2), '.', 'MarkerSize', 5)
+hold on; plot(refOnFeatures(:,1),refOnFeatures(:,2), '.', 'MarkerSize', 5)
+plot(HVAC1OnFeatures(:,1),HVAC1OnFeatures(:,2), '.', 'MarkerSize', 5)
+plot(HVAC2OnFeatures(:,1),HVAC2OnFeatures(:,2), '.', 'MarkerSize', 5)
+legend('h10p','hot','ref','HVAC1','HVAC2')
+title('Feature space for Top 5 Appliances')
