@@ -13,17 +13,17 @@ function trainingFeatureExtraction(trainingDataSet, applianceLabel, decisionIDs,
     [on, off, events] = GLR_EventDetection(trainingDataSet, a, b, c, d, e, f, g);
 
     trainingWindow = 10;
-    onFilePath = cat(2, applianceLabel, 'OnFeatures');
-    offFilePath = cat(2, applianceLabel, 'OffFeatures');
+    onFilePath = cat(2, applianceLabel, 'OnFeatures.mat');
+    offFilePath = cat(2, applianceLabel, 'OffFeatures.mat');
     
     % Load features if exist
     onExist = 0; offExist = 0;
-    if exist(onFilePath, 'file')
+    if exist(onFilePath, 'file') == 2
         onFeatures = load(onFilePath);
         onFeatureSet = onFeatures.featureSet;
         onExist = 1;
     end    
-    if exist(offFilePath, 'file')
+    if exist(offFilePath, 'file') == 2
         offFeatures = load(offFilePath);
         offFeatureSet = offFeatures.featureSet;
         offExist = 1;
