@@ -1,0 +1,5 @@
+%concatanateFeatures
+
+ON = prtDataSetClass;
+fridge = load('FridgeOnFeatures);
+h10p = load(h10pOnFeatures.mat);
