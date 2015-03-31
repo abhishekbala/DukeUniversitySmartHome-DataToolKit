@@ -18,11 +18,11 @@ load('refrigerator.mat')
 load('hotbox.mat')
 load('HVAC1.mat')
 load('HVAC2.mat')
-h10onTruth = [h10onTruth*3]';
 refOnTruth= [refOnTruth*1]';
-hotOnTruth = [hotOnTruth*5]';
-HVAC1onTruth = [HVAC1onTruth*7]';
-HVAC2onTruth = [HVAC2onTruth*9]';
+h10onTruth = [h10onTruth*2]';
+hotOnTruth = [hotOnTruth*3]';
+HVAC1onTruth = [HVAC1onTruth*4]';
+HVAC2onTruth = [HVAC2onTruth*5]';
 onTruths = h10onTruth + refOnTruth + hotOnTruth + HVAC1onTruth + HVAC2onTruth;
 dummy.data = onTruths;
 dummy.targets = dummy.data;

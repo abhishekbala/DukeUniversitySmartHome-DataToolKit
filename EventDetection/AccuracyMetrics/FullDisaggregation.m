@@ -57,16 +57,26 @@ OFFdcsID = zeros(1, dataLength);
 for i = (1 + trainingWindow):(dataLength-trainingWindow)
     
     if myOn(i) == 1
-        knnClassOut = DisagClassifier(aggregatePower, knnClassifierOn, i, trainingWindow);
-        
+        %knnClassOut = DisagClassifier(aggregatePower, knnClassifierOn, i, trainingWindow);
+        eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
+        eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
+        eventDelta = max(eventWindow) - min(eventWindow);
+        eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
+        %eventFeatures = prtDataSetClass(eventWindow);
+        knnClassOut = knnClassifierOn.run(eventFeatures);
         [~, dcsID] = max(knnClassOut.data);
         
         % Printing Out Appliance Classification
         ONdcsID(i) = dcsID; % Classifies the ith detected on-event
 
     elseif myOff(i) == 1
-        knnClassOut = DisagClassifier(aggregatePower, knnClassifierOff, i, trainingWindow);
-        
+        %knnClassOut = DisagClassifier(aggregatePower, knnClassifierOff, i, trainingWindow);
+        eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
+        eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
+        eventDelta = max(eventWindow) - min(eventWindow);
+        eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
+        %eventFeatures = prtDataSetClass(eventWindow);
+        knnClassOut = knnClassifierOn.run(eventFeatures);
         [~, dcsID] = max(knnClassOut.data);
         
         % Printing Out Appliance Classification
@@ -107,11 +117,5 @@ legend('Data', 'On Events', 'Off Events');
 end
 
 function [knnClassOut] = DisagClassifier(aggregatePower, knnClassifier, n, trainingWindow)
-eventWindow = aggregatePower(n-trainingWindow:n+trainingWindow);
-eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
-eventDelta = max(eventWindow) - min(eventWindow);
-eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
-%eventFeatures = prtDataSetClass(eventWindow);
 
-knnClassOut = knnClassifier.run(eventFeatures);
 end
