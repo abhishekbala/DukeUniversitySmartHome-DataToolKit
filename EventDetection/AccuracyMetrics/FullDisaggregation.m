@@ -115,7 +115,3 @@ xlabel('Time Series Values (s)');
 ylabel('Power Values (W)');
 legend('Data', 'On Events', 'Off Events');
 end
-
-function [knnClassOut] = DisagClassifier(aggregatePower, knnClassifier, n, trainingWindow)
-
-end

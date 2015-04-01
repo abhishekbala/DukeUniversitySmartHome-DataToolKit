@@ -27,3 +27,20 @@ onTruths = h10onTruth + refOnTruth + hotOnTruth + HVAC1onTruth + HVAC2onTruth;
 dummy.data = onTruths;
 dummy.targets = dummy.data;
 truthON = catObservations(truthON, dummy);
+
+dummy = prtDataSetClass;
+truthOFF = prtDataSetClass;
+load('h10p.mat')
+load('refrigerator.mat')
+load('hotbox.mat')
+load('HVAC1.mat')
+load('HVAC2.mat')
+refOffTruth= [refOffTruth*1]';
+h10offTruth = [h10offTruth*2]';
+hotOffTruth = [hotOffTruth*3]';
+HVAC1offTruth = [HVAC1offTruth*4]';
+HVAC2offTruth = [HVAC2offTruth*5]';
+offTruths = h10offTruth + refOffTruth + hotOffTruth + HVAC1offTruth + HVAC2offTruth;
+dummy.data = offTruths;
+dummy.targets = dummy.data;
+truthOFF = catObservations(truthOFF, dummy);
