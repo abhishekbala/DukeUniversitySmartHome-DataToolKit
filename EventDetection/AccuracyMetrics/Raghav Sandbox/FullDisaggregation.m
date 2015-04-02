@@ -1,4 +1,4 @@
-function [ ONdcsID, OFFdcsID, TOTdcsID ] = FullDisaggregation( data, onEvents, offEvents, allEvents )
+function [ ONdcsID, OFFdcsID, TOTdcsID, MaxChebDistance, MeanChebDistance, MaxDistance, MeanDistance ] = FullDisaggregation( data, onEvents, offEvents, allEvents )
 %FULLDISAGGREGATION takes in a data set an GLR parameters and
 %disaggregates on the data set.
 %   data ==> should be a 1 x N or N x 1 vector of data.
@@ -28,11 +28,11 @@ end
 %trainKNNClassifier
 
 knnClassifierOn = prtClassKnn;
-knnClassifierOn.k = 5;
+knnClassifierOn.k = 2;
 knnClassifierOn = knnClassifierOn.train(fullOnSet);
 
 knnClassifierOff = prtClassKnn;
-knnClassifierOff.k = 5;
+knnClassifierOff.k = 2;
 knnClassifierOff = knnClassifierOff.train(fullOffSet);
 
 % Data Manipulation:
@@ -54,9 +54,15 @@ trainingWindow = 10;
 % ideally the the on events will correspond to their specific dcIDs and so
 % will the off events
 
+MaxDistance = [];
+MeanDistance = [];
+%chebDistance = prtDistanceChebychev(eventFeatures,filterFeatures);
+MaxChebDistance = [];
+MeanChebDistance = [];
+       
 ONdcsID = zeros(1, dataLength);
 OFFdcsID = zeros(1, dataLength);
-
+count = 0;
 for i = (1 + trainingWindow):(dataLength-trainingWindow)
     
     if myOn(i) == 1
@@ -69,8 +75,41 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
         knnClassOut = knnClassifierOn.run(eventFeatures);
         [~, dcsID] = max(knnClassOut.data);
         
+        if dcsID == 1;
+            index = 1;
+        elseif dcsID == 2;
+            index = 3;
+        elseif dcsID == 3;
+            index = 5;
+        elseif dcsID == 4;
+            index = 7;
+        elseif dcsID == 5;
+            index = 9;
+        end
+        
+        filterFrom = fullOnSet;
+        filterFeatures = filterFrom.retainClasses(index);
+            
+        distance = prtDistanceEuclidean(eventFeatures,filterFeatures);
+        maxDistance = max(distance);
+        meanDistance = mean(distance);
+        chebDistance = prtDistanceChebychev(eventFeatures,filterFeatures);
+        maxChebDistance = max(chebDistance);
+        meanChebDistance = mean(chebDistance);
+        MaxDistance = [MaxDistance maxDistance];
+        MeanDistance = [MeanDistance meanDistance];
+        MaxChebDistance = [MaxChebDistance maxChebDistance];
+        MeanChebDistance = [MeanChebDistance meanChebDistance];
+        
         % Printing Out Appliance Classification
-        ONdcsID(i) = dcsID; % Classifies the ith detected on-event
+        if or(dcsID == 4, dcsID == 5)
+            ONdcsID(i) = dcsID;
+        elseif and(meanDistance < 1000, dcsID == 1)
+            ONdcsID(i) = dcsID;
+        elseif meanDistance < 100;
+            ONdcsID(i) = dcsID; % Classifies the ith detected on-event
+        end
+        count = count + 1;
 
     elseif myOff(i) == 1
         %knnClassOut = DisagClassifier(aggregatePower, knnClassifierOff, i, trainingWindow);
@@ -97,7 +136,6 @@ end
 % ONdcsID(i) is nonzero (OFFdcsID(i) is 0), or OFFdcsID(i) is nonzero (ONdcsID(I) is 0)  
 OFFdcsID = OFFdcsID + 0.5;
 TOTdcsID = ONdcsID + OFFdcsID;
-
 end
 
 function PlotGraphs(myOn, myOff, aggregatePower)
