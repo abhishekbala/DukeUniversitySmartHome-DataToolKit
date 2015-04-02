@@ -169,4 +169,21 @@ title('ON Appliance Classification')
 xlabel('ON event index')
 hold off
 
-difference = guessOnDCSID - 
+difference = guessOnDCSID - truthOnDCSID;
+figure(8)
+hold on
+subplot(3,1,3)
+plot(difference,'o')
+plot(1:length(difference),zeros(length(difference)),'r')
+title('Error in Classification (POINTS SHOULD BE AT ZERO)')
+xlabel('ON event index')
+hold off
+
+truthOn = prtDataSetClass;
+truthOn.targets = truthOnDCSID';
+truthOn.data = truthOnDCSID';
+guessOn = prtDataSetClass;
+guessOn.targets = truthOnDCSID';
+guessOn.data = guessOnDCSID';
+figure(9)
+prtScoreConfusionMatrix(guessOn,truthOn)
