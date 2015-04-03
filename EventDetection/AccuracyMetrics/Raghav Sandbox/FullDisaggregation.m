@@ -16,6 +16,15 @@ for iFile = 1:length(onFiles)
     %plot(onFeatureSet)
 end
 
+maxONSlope = max(fullOnSet.data(:,1));
+maxONDelta = max(fullOnSet.data(:,2));
+fullOnSet.data(:,1) = fullOnSet.data(:,1)/maxONSlope;
+fullOnSet.data(:,2) = fullOnSet.data(:,2)/maxONDelta;
+
+figure(1)
+plot(fullOnSet)
+hold on
+
 % Loading Off Files
 offFiles = prtUtilSubDir('OffFeatures','*.mat');
 fullOffSet = prtDataSetClass();
@@ -25,14 +34,16 @@ for iFile = 1:length(offFiles)
     fullOffSet = catObservations(fullOffSet, offFeatureSet);
 end
 
+
+
 %trainKNNClassifier
 
 knnClassifierOn = prtClassKnn;
-knnClassifierOn.k = 2;
+knnClassifierOn.k = 8;
 knnClassifierOn = knnClassifierOn.train(fullOnSet);
 
 knnClassifierOff = prtClassKnn;
-knnClassifierOff.k = 2;
+knnClassifierOff.k = 8;
 knnClassifierOff = knnClassifierOff.train(fullOffSet);
 
 % Data Manipulation:
@@ -68,8 +79,8 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
     if myOn(i) == 1
         %knnClassOut = DisagClassifier(aggregatePower, knnClassifierOn, i, trainingWindow);
         eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
-        eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
-        eventDelta = max(eventWindow) - min(eventWindow);
+        eventSlope = polyfit(1:length(eventWindow),eventWindow,1)/maxONSlope;
+        eventDelta = (max(eventWindow) - min(eventWindow))/maxONDelta;
         eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
         %eventFeatures = prtDataSetClass(eventWindow);
         knnClassOut = knnClassifierOn.run(eventFeatures);
@@ -110,7 +121,14 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
             ONdcsID(i) = dcsID; % Classifies the ith detected on-event
         end
         count = count + 1;
-
+        
+        figure(1)
+        hold on
+        featurePoint = plot(eventSlope(1),eventDelta,'xk','MarkerSize',100);
+        set(featurePoint,'xdata',eventSlope(1),'ydata',eventDelta);
+        dcsID
+        delete(featurePoint);
+        
     elseif myOff(i) == 1
         %knnClassOut = DisagClassifier(aggregatePower, knnClassifierOff, i, trainingWindow);
         eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
