@@ -39,11 +39,11 @@ end
 %trainKNNClassifier
 
 knnClassifierOn = prtClassKnn;
-knnClassifierOn.k = 8;
+knnClassifierOn.k = 2;
 knnClassifierOn = knnClassifierOn.train(fullOnSet);
 
 knnClassifierOff = prtClassKnn;
-knnClassifierOff.k = 8;
+knnClassifierOff.k = 2;
 knnClassifierOff = knnClassifierOff.train(fullOffSet);
 
 % Data Manipulation:
@@ -89,13 +89,13 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
         if dcsID == 1;
             index = 1;
         elseif dcsID == 2;
-            index = 3;
-        elseif dcsID == 3;
             index = 5;
-        elseif dcsID == 4;
+        elseif dcsID == 3;
             index = 7;
-        elseif dcsID == 5;
+        elseif dcsID == 4;
             index = 9;
+        %elseif dcsID == 5;
+        %    index = 9;
         end
         
         filterFrom = fullOnSet;
@@ -113,7 +113,7 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
         MeanChebDistance = [MeanChebDistance meanChebDistance];
         
         % Printing Out Appliance Classification
-        if or(dcsID == 4, dcsID == 5)
+        if or(dcsID == 3, dcsID == 4)
             ONdcsID(i) = dcsID;
         elseif and(meanDistance < 1000, dcsID == 1)
             ONdcsID(i) = dcsID;

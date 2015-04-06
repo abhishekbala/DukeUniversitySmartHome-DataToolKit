@@ -4,7 +4,7 @@ load test1Day.mat
 %% Get events from submetered data
 [onEventsRef, offEventsRef, allEventsRef] = GLR_EventDetection(refrigerator, 80,15,10,-20,1,0,4);
 [onEventsHot, offEventsHot, allEventsHot] = GLR_EventDetection(hotbox, 80,15,10,-20,1,0,4);
-[onEventsH10P, offEventsH10P, allEventsH10P] = GLR_EventDetection(h10p, 80,15,10,-20,1,0,4);
+%[onEventsH10P, offEventsH10P, allEventsH10P] = GLR_EventDetection(h10p, 80,15,10,-20,1,0,4);
 [onEventsHVAC1, offEventsHVAC1, allEventsHVAC1] = GLR_EventDetection(HVAC1, 80,15,10,-20,1,0,4);
 [onEventsHVAC2, offEventsHVAC2, allEventsHVAC2] = GLR_EventDetection(HVAC2, 80,15,10,-20,1,0,4);
 %% Preliminary visual comparisons of TRUE ON values vs Detected ON Events
@@ -32,17 +32,17 @@ xlabel('Time of day (s)')
 title('Submetered Hot Box ON events detected')
 hold off
 
-figure(5)
-hold on
-subplot(2,1,1)
-plot(onEventsAgg,'b')
-title('Aggregate ON events detected')
-xlabel('Time of day (s)')
-subplot(2,1,2)
-plot(onEventsH10P,'r')
-xlabel('Time of day (s)')
-title('Submetered H10P ON events detected')
-hold off
+% figure(5)
+% hold on
+% subplot(2,1,1)
+% plot(onEventsAgg,'b')
+% title('Aggregate ON events detected')
+% xlabel('Time of day (s)')
+% subplot(2,1,2)
+% plot(onEventsH10P,'r')
+% xlabel('Time of day (s)')
+% title('Submetered H10P ON events detected')
+% hold off
 
 
 figure(6)
@@ -99,21 +99,21 @@ subplot(2,1,1)
 hold on
 plot(onEventsAgg2,'b')
 
-onEventsAgg3 = onEventsAgg2;
-for i = 31:length(onEventsAgg3)-30;
-    if and(onEventsH10P(1,i) == 1,onEventsAgg3(1,i) == 1);
-        onEventsAgg3(1,i) = 4;
-    elseif and(onEventsH10P(1,i) == 1, not(isempty(find(onEventsAgg3(1,i-30:i+30),1))))
-        onEventsAgg3(1,i-31 + find(onEventsAgg3(1,i-30:i+30),1)) = 4;
-    end
-end
+% onEventsAgg3 = onEventsAgg2;
+% for i = 31:length(onEventsAgg3)-30;
+%     if and(onEventsH10P(1,i) == 1,onEventsAgg3(1,i) == 1);
+%         onEventsAgg3(1,i) = 4;
+%     elseif and(onEventsH10P(1,i) == 1, not(isempty(find(onEventsAgg3(1,i-30:i+30),1))))
+%         onEventsAgg3(1,i-31 + find(onEventsAgg3(1,i-30:i+30),1)) = 4;
+%     end
+% end
+% 
+% figure(5)
+% subplot(2,1,1)
+% hold on
+% plot(onEventsAgg3,'b')
 
-figure(5)
-subplot(2,1,1)
-hold on
-plot(onEventsAgg3,'b')
-
-onEventsAgg4 = onEventsAgg3;
+onEventsAgg4 = onEventsAgg2;
 for i = 31:length(onEventsAgg4)-30;
     if and(onEventsHVAC1(1,i) == 1,onEventsAgg4(1,i) == 1);
         onEventsAgg4(1,i) = 5;
