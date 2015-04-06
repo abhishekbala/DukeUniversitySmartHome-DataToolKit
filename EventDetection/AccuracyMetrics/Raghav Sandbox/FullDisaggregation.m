@@ -39,11 +39,11 @@ end
 %trainKNNClassifier
 
 knnClassifierOn = prtClassKnn;
-knnClassifierOn.k = 2;
+knnClassifierOn.k = 5;
 knnClassifierOn = knnClassifierOn.train(fullOnSet);
 
 knnClassifierOff = prtClassKnn;
-knnClassifierOff.k = 2;
+knnClassifierOff.k = 5;
 knnClassifierOff = knnClassifierOff.train(fullOffSet);
 
 % Data Manipulation:
@@ -114,11 +114,17 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
         
         % Printing Out Appliance Classification
         if or(dcsID == 3, dcsID == 4)
-            ONdcsID(i) = dcsID;
-        elseif and(meanDistance < 1000, dcsID == 1)
-            ONdcsID(i) = dcsID;
-        elseif meanDistance < 100;
-            ONdcsID(i) = dcsID; % Classifies the ith detected on-event
+            if and(dcsID == 3, maxDistance > 0.1)
+                ONdcsID(i) = dcsID + 1;
+            else
+                ONdcsID(i) = dcsID;
+            end
+%         elseif dcsID == 1
+%             if meanDistance < 0.015
+%                 ONdcsID(i) = dcsID;
+%             end
+         elseif meanDistance < 0.005;
+             ONdcsID(i) = dcsID; % Classifies the ith detected on-event
         end
         count = count + 1;
         

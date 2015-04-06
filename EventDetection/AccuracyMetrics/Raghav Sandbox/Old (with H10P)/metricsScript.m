@@ -76,6 +76,9 @@ for i = 31:length(onEventsAgg1)-30;
         onEventsAgg1(1,i) = 2;
     elseif and(onEventsRef(1,i) == 1, not(isempty(find(onEventsAgg1(1,i-30:i+30),1))))
         onEventsAgg1(1,i-31 + find(onEventsAgg1(1,i-30:i+30),1)) = 2;
+    elseif onEventsRef(1,i) == 1
+        onEventsAgg1(1,i) = 2;
+        onEventsAgg(1,i) = 1;
     end
 end
 
@@ -91,6 +94,9 @@ for i = 31:length(onEventsAgg2)-30;
         onEventsAgg2(1,i) = 3;
     elseif and(onEventsHot(1,i) == 1, not(isempty(find(onEventsAgg2(1,i-30:i+30),1))))
         onEventsAgg2(1,i-31 + find(onEventsAgg2(1,i-30:i+30),1)) = 3;
+    elseif onEventsHot(1,i) == 1
+        onEventsAgg1(1,i) = 3;
+        onEventsAgg(1,i) = 1;
     end
 end
 
@@ -116,9 +122,12 @@ plot(onEventsAgg2,'b')
 onEventsAgg4 = onEventsAgg2;
 for i = 31:length(onEventsAgg4)-30;
     if and(onEventsHVAC1(1,i) == 1,onEventsAgg4(1,i) == 1);
-        onEventsAgg4(1,i) = 5;
+        onEventsAgg4(1,i) = 4;
     elseif and(onEventsHVAC1(1,i) == 1, not(isempty(find(onEventsAgg4(1,i-30:i+30),1))))
-        onEventsAgg4(1,i-31 + find(onEventsAgg4(1,i-30:i+30),1)) = 5;
+        onEventsAgg4(1,i-31 + find(onEventsAgg4(1,i-30:i+30),1)) = 4;
+    elseif onEventsHVAC1(1,i) == 1
+        onEventsAgg1(1,i) = 4;
+        onEventsAgg(1,i) = 1;
     end
 end
 
@@ -130,9 +139,12 @@ plot(onEventsAgg4,'b')
 onEventsAgg5 = onEventsAgg4;
 for i = 31:length(onEventsAgg5)-30;
     if and(onEventsHVAC2(1,i) == 1,onEventsAgg5(1,i) == 1);
-        onEventsAgg5(1,i) = 6;
+        onEventsAgg5(1,i) = 5;
     elseif and(onEventsHVAC2(1,i) == 1, not(isempty(find(onEventsAgg5(1,i-30:i+30),1))))
-        onEventsAgg5(1,i-31 + find(onEventsAgg5(1,i-30:i+30),1)) = 6;
+        onEventsAgg5(1,i-31 + find(onEventsAgg5(1,i-30:i+30),1)) = 5;
+    elseif onEventsHVAC2(1,i) == 1
+        onEventsAgg1(1,i) = 5;
+        onEventsAgg(1,i) = 1;
     end
 end
 
@@ -164,7 +176,7 @@ guessOnDCSID = ONdcsID;
 % Remove non-events
 guessOnDCSID(onEventsAgg == 0) = [];
 
-%% Visualise results
+% Visualise results
 figure(8)
 subplot(3,1,2)
 plot(guessOnDCSID,'b')
@@ -179,7 +191,8 @@ subplot(3,1,3)
 plot(difference,'o')
 hold on
 plot(1:length(difference),zeros(length(difference)),'r')
-title('Error in Classification (POINTS SHOULD BE AT ZERO)')
+title('Error in Classification')
+ylabel('(Classified ID - Actual ID)')
 xlabel('ON event index')
 hold off
 
@@ -194,11 +207,14 @@ subplot(3,1,2)
 plot(difference,'o')
 hold on
 plot(1:length(difference),zeros(length(difference)),'r')
-title('Error in Classification (POINTS SHOULD BE AT ZERO)')
+title('Error in Classification')
 xlabel('ON event index')
+ylabel('(Classified ID - Actual ID)')
 subplot(3,1,3)
 plot(MeanDistance)
-title('Euclidian Distance')
+title('Mean Euclidian Distance')
+xlabel('ON event index')
+ylabel('Distance')
 
 figure(10)
 subplot(3,1,1)
@@ -211,18 +227,62 @@ subplot(3,1,2)
 plot(difference,'o')
 hold on
 plot(1:length(difference),zeros(length(difference)),'r')
-title('Error in Classification (POINTS SHOULD BE AT ZERO)')
+title('Error in Classification')
+ylabel('(Classified ID - Actual ID)')
 xlabel('ON event index')
 subplot(3,1,3)
 plot(MeanChebDistance)
-title('Chebyshev Distance')
+title('Mean Chebyshev Distance')
+xlabel('ON event index')
+ylabel('Distance')
 
-%% Confusion Matrix
+figure(11)
+subplot(3,1,1)
+plot(truthOnDCSID)
+hold on
+title('True ON Appliance')
+xlabel('ON event index')
+ylabel('Appliance Class No.')
+subplot(3,1,2)
+plot(difference,'o')
+hold on
+plot(1:length(difference),zeros(length(difference)),'r')
+title('Error in Classification')
+ylabel('(Classified ID - Actual ID)')
+xlabel('ON event index')
+subplot(3,1,3)
+plot(MaxDistance)
+title('Max Euclidian Distance')
+xlabel('ON event index')
+ylabel('Distance')
+
+
+figure(12)
+subplot(3,1,1)
+plot(truthOnDCSID)
+hold on
+title('True ON Appliance')
+xlabel('ON event index')
+ylabel('Appliance Class No.')
+subplot(3,1,2)
+plot(difference,'o')
+hold on
+plot(1:length(difference),zeros(length(difference)),'r')
+title('Error in Classification')
+ylabel('(Classified ID - Actual ID)')
+xlabel('ON event index')
+subplot(3,1,3)
+plot(MaxChebDistance)
+title('Max Chebyshev Distance')
+xlabel('ON event index')
+ylabel('Distance')
+
+% Confusion Matrix
 truthOn = prtDataSetClass;
 truthOn.targets = truthOnDCSID';
 truthOn.data = truthOnDCSID';
 guessOn = prtDataSetClass;
 guessOn.targets = truthOnDCSID';
 guessOn.data = guessOnDCSID';
-figure(11)
+figure(13)
 prtScoreConfusionMatrix(guessOn,truthOn)
