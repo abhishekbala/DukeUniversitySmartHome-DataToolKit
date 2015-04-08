@@ -151,12 +151,24 @@ onFeatureSetPCA.targets = onTargets;
 offFeatureSetPCA.data = offFeaturesMatrix;
 offFeatureSetPCA.targets = offTargets;
  
-pcaON = prtPreProcPca('nComponents',2);
+pcaON = prtPreProcPca('nComponents',1);
 pcaON = pcaON.train(onFeatureSetPCA);
 pcaONFeatures = pcaON.run(onFeatureSetPCA);
 plot(pcaONFeatures)
 
-pcaOFF = prtPreProcPca('nComponents',2);
+pcaOFF = prtPreProcPca('nComponents',1);
 pcaOFF = pcaOFF.train(offFeatureSetPCA);
-pcaOFFFeatures = pcaOFF.run(offFeatureSetPCA);
-plot(pcaOFFFeatures)
+pcaOFFeatures = pcaOFF.run(offFeatureSetPCA);
+plot(pcaOFFeatures)
+
+onFeatures = prtDataSetClass;
+onFeatures.data = [pcaONFeatures.data onSlope onDelta];
+onFeatures.targets = onTargets;
+onFeatures.classNames = {'Refrigerator','Hotbox','HVAC1','HVAC2'};
+plot(onFeatures)
+
+offFeatures = prtDataSetClass;
+offFeatures.data = [pcaOFFeatures.data offSlope offDelta];
+offFeatures.targets = offTargets;
+offFeatures.classNames = {'Refrigerator','Hotbox','HVAC1','HVAC2'};
+plot(offFeatures)
