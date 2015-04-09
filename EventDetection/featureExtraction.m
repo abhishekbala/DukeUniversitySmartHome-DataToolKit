@@ -164,11 +164,19 @@ plot(pcaOFFeatures)
 onFeatures = prtDataSetClass;
 onFeatures.data = [pcaONFeatures.data onSlope onDelta];
 onFeatures.targets = onTargets;
-onFeatures.classNames = {'Refrigerator','Hotbox','HVAC1','HVAC2'};
+onFeatures.targets(onFeatures.data(:,3) > 1e4) = 5;
+onFeatures.targets(onFeatures.targets(:,1) == 4) = 3;
+onFeatures.targets(onFeatures.targets(:,1) == 5) = 4;
+onFeatures.classNames = {'Refrigerator','Hotbox','HVACMode1','HVACMode2'};
+figure(1)
 plot(onFeatures)
 
 offFeatures = prtDataSetClass;
 offFeatures.data = [pcaOFFeatures.data offSlope offDelta];
 offFeatures.targets = offTargets;
-offFeatures.classNames = {'Refrigerator','Hotbox','HVAC1','HVAC2'};
+offFeatures.targets(offFeatures.data(:,3) > 1e4) = 5;
+offFeatures.targets(offFeatures.targets(:,1) == 4) = 3;
+offFeatures.targets(offFeatures.targets(:,1) == 5) = 4;
+offFeatures.classNames = {'Refrigerator','Hotbox','HVACMode1','HVACMode2'};
+figure(2)
 plot(offFeatures)
