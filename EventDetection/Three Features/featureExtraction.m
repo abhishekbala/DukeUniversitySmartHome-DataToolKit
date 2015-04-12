@@ -151,12 +151,12 @@ onFeatureSetPCA.targets = onTargets;
 offFeatureSetPCA.data = offFeaturesMatrix;
 offFeatureSetPCA.targets = offTargets;
  
-pcaON = prtPreProcPca('nComponents',1);
+pcaON = prtPreProcPca('nComponents',3);
 pcaON = pcaON.train(onFeatureSetPCA);
 pcaONFeatures = pcaON.run(onFeatureSetPCA);
 plot(pcaONFeatures)
 
-pcaOFF = prtPreProcPca('nComponents',1);
+pcaOFF = prtPreProcPca('nComponents',3);
 pcaOFF = pcaOFF.train(offFeatureSetPCA);
 pcaOFFeatures = pcaOFF.run(offFeatureSetPCA);
 plot(pcaOFFeatures)
