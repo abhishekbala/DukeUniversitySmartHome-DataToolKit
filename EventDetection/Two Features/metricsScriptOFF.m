@@ -229,26 +229,6 @@ title('Mean Euclidian Distance')
 xlabel('OFF event index')
 ylabel('Distance')
 
-figure(10)
-subplot(3,1,1)
-plot(truthOnDCSID)
-hold on
-title('True ON Appliance')
-xlabel('ON event index')
-ylabel('Appliance Class No.')
-subplot(3,1,2)
-plot(difference,'o')
-hold on
-plot(1:length(difference),zeros(length(difference)),'r')
-title('Error in Classification')
-ylabel('(Classified ID - Actual ID)')
-xlabel('ON event index')
-subplot(3,1,3)
-plot(MeanChebDistance)
-title('Mean Chebyshev Distance')
-xlabel('ON event index')
-ylabel('Distance')
-
 figure(11)
 subplot(3,1,1)
 plot(truthOffDCSID,'x')
@@ -268,8 +248,6 @@ plot(MaxDistanceOFF)
 title('Max Euclidian Distance')
 xlabel('OFF event index')
 ylabel('Distance')
-
-
 
 % Confusion Matrix
 truthOff = prtDataSetClass;
