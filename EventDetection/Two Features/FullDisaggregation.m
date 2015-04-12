@@ -1,4 +1,4 @@
-function [ ONdcsID, OFFdcsID, TOTdcsID, MaxChebDistance, MeanChebDistance, MaxDistance, MeanDistance ] = FullDisaggregation( data, onEvents, offEvents, allEvents )
+function [ ONdcsID, OFFdcsID, TOTdcsID, MaxDistanceON, MaxDistanceOFF, MeanDistanceON, MeanDistanceOFF ] = FullDisaggregation( data, onEvents, offEvents, allEvents )
 %FULLDISAGGREGATION takes in a data set an GLR parameters and
 %disaggregates on the data set.
 %   data ==> should be a 1 x N or N x 1 vector of data.
@@ -29,15 +29,24 @@ fullOnSet.data(:,2) = fullOnSet.data(:,2)/maxONDelta;
 % hold on
 
 % Loading Off Files
-offFiles = prtUtilSubDir('..\OffFeatures','*.mat');
-fullOffSet = prtDataSetClass();
-for iFile = 1:length(offFiles)
-    %cFile = offFiles{iFile};
-    load(offFiles{iFile});
-    fullOffSet = catObservations(fullOffSet, offFeatureSet);
-end
+% offFiles = prtUtilSubDir('..\OffFeatures','*.mat');
+% fullOffSet = prtDataSetClass();
+% for iFile = 1:length(offFiles)
+%     %cFile = offFiles{iFile};
+%     load(offFiles{iFile});
+%     fullOffSet = catObservations(fullOffSet, offFeatureSet);
+% end
+load offFeatures;
+fullOffSet = offFeatures;
 
+minOFFSlope = min(fullOffSet.data(:,1));
+maxOFFDelta = max(fullOffSet.data(:,2));
+fullOffSet.data(:,1) = fullOffSet.data(:,1)/minOFFSlope;
+fullOffSet.data(:,2) = fullOffSet.data(:,2)/maxOFFDelta;
 
+% figure(2)
+% plot(fullOffSet)
+% hold on
 
 %trainKNNClassifier
 
@@ -68,11 +77,10 @@ trainingWindow = 10;
 % ideally the the on events will correspond to their specific dcIDs and so
 % will the off events
 
-MaxDistance = [];
-MeanDistance = [];
-%chebDistance = prtDistanceChebychev(eventFeatures,filterFeatures);
-MaxChebDistance = [];
-MeanChebDistance = [];
+MaxDistanceON = [];
+MeanDistanceON = [];
+MaxDistanceOFF = [];
+MeanDistanceOFF = [];
        
 ONdcsID = zeros(1, dataLength);
 OFFdcsID = zeros(1, dataLength);
@@ -80,54 +88,28 @@ count = 0;
 for i = (1 + trainingWindow):(dataLength-trainingWindow)
     
     if myOn(i) == 1
-        %knnClassOut = DisagClassifier(aggregatePower, knnClassifierOn, i, trainingWindow);
         eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
         eventSlope = polyfit(1:length(eventWindow),eventWindow,1)/maxONSlope;
         eventDelta = (max(eventWindow) - min(eventWindow))/maxONDelta;
         eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
-        %eventFeatures = prtDataSetClass(eventWindow);
         knnClassOut = knnClassifierOn.run(eventFeatures);
         [~, dcsID] = max(knnClassOut.data);
         
-        if dcsID == 1;
-            index = 1;
-        elseif dcsID == 2;
-            index = 2;
-        elseif dcsID == 3;
-            index = 3;
-        elseif dcsID == 4;
-            index = 4;
-        end
-        
         filterFrom = fullOnSet;
-        filterFeatures = filterFrom.retainClasses(index);
+        filterFeatures = filterFrom.retainClasses(dcsID);
             
         distance = prtDistanceEuclidean(eventFeatures,filterFeatures);
-        maxDistance = max(distance);
-        meanDistance = mean(distance);
-        chebDistance = prtDistanceChebychev(eventFeatures,filterFeatures);
-        maxChebDistance = max(chebDistance);
-        meanChebDistance = mean(chebDistance);
-        MaxDistance = [MaxDistance maxDistance];
-        MeanDistance = [MeanDistance meanDistance];
-        MaxChebDistance = [MaxChebDistance maxChebDistance];
-        MeanChebDistance = [MeanChebDistance meanChebDistance];
+        maxDistanceON = max(distance);
+        meanDistanceON = mean(distance);
+        MaxDistanceON = [MaxDistanceON maxDistanceON];
+        MeanDistanceON = [MeanDistanceON meanDistanceON];
         
         % Printing Out Appliance Classification
         if or(dcsID == 3, dcsID == 4)
-%             if and(dcsID == 3, maxDistance > 0.1)
-%                 ONdcsID(i) = dcsID + 1;
-%             else
                 ONdcsID(i) = dcsID;
-%             end
-%         elseif dcsID == 1
-%             if meanDistance < 0.015
-%                 ONdcsID(i) = dcsID;
-%             end
-         elseif meanDistance < 0.005;
+         elseif meanDistanceON < 0.005;
              ONdcsID(i) = dcsID; % Classifies the ith detected on-event
         end
-        count = count + 1;
         
 %         figure(1)
 %         hold on
@@ -137,17 +119,35 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
 %         delete(featurePoint);
         
     elseif myOff(i) == 1
-        %knnClassOut = DisagClassifier(aggregatePower, knnClassifierOff, i, trainingWindow);
         eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
-        eventSlope = polyfit(1:length(eventWindow),eventWindow,1);
-        eventDelta = max(eventWindow) - min(eventWindow);
+        eventSlope = polyfit(1:length(eventWindow),eventWindow,1)/minOFFSlope;
+        eventDelta = (max(eventWindow) - min(eventWindow))/maxOFFDelta;
         eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
-        %eventFeatures = prtDataSetClass(eventWindow);
-        knnClassOut = knnClassifierOn.run(eventFeatures);
+        knnClassOut = knnClassifierOff.run(eventFeatures);
         [~, dcsID] = max(knnClassOut.data);
         
+        filterFrom = fullOffSet;
+        filterFeatures = filterFrom.retainClasses(dcsID);
+            
+        distance = prtDistanceEuclidean(eventFeatures,filterFeatures);
+        maxDistanceOFF = max(distance);
+        meanDistanceOFF = mean(distance);
+        MaxDistanceOFF = [MaxDistanceOFF maxDistanceOFF];
+        MeanDistanceOFF = [MeanDistanceOFF meanDistanceOFF];       
+        
         % Printing Out Appliance Classification
-        OFFdcsID(i) = dcsID; % Classifies the ith detected off-event
+        if or(dcsID == 3, dcsID == 4)
+                OFFdcsID(i) = dcsID;
+         elseif meanDistanceOFF < 0.005;
+             OFFdcsID(i) = dcsID; % Classifies the ith detected on-event
+        end
+        
+%         figure(2)
+%         hold on
+%         featurePoint = plot(eventSlope(1),eventDelta,'xk','MarkerSize',100);
+%         set(featurePoint,'xdata',eventSlope(1),'ydata',eventDelta);
+%         dcsID
+%         delete(featurePoint);
     end
 end
 
@@ -159,7 +159,7 @@ end
 
 % 2. For each element i in both ONdcsID and OFFdcsID, either both are 0,
 % ONdcsID(i) is nonzero (OFFdcsID(i) is 0), or OFFdcsID(i) is nonzero (ONdcsID(I) is 0)  
-OFFdcsID = OFFdcsID + 0.5;
+OFFdcsID = OFFdcsID;
 TOTdcsID = ONdcsID + OFFdcsID;
 end
 
