@@ -8,12 +8,12 @@ offMatrix = zeros(length(offIndex), 61);
 for i = 1:length(onIndex)
     onMean = mean(data(onIndex(1,i)-30:onIndex(1,i)+30,1));
     onStd = std(data(onIndex(1,i)-30:onIndex(1,i)+30,1));
-    onMatrix(i, :) = ((data(onIndex(1,i)-30:onIndex(1,i)+30,1) - onMean))'; % / onStd)';
+    onMatrix(i, :) = (((data(onIndex(1,i)-30:onIndex(1,i)+30,1) - onMean)) / onStd)';
 end
 onMatrix;
 for i = 1:length(offIndex)
     offMean = mean(data(offIndex(1,i)-30:offIndex(1,i)+30,1));
     offStd = std(data(offIndex(1,i)-30:offIndex(1,i)+30,1));
-    offMatrix(i, :) = ((data(offIndex(1,i)-30:offIndex(1,i)+30,1) - offMean))'; % / offStd)';
+    offMatrix(i, :) = (((data(offIndex(1,i)-30:offIndex(1,i)+30,1) - offMean)) / offStd)';
 end
 offMatrix;

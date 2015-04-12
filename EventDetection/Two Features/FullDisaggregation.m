@@ -16,13 +16,10 @@ function [ ONdcsID, OFFdcsID, TOTdcsID, MaxChebDistance, MeanChebDistance, MaxDi
 %     %plot(onFeatureSet)
 % end
 
-load ..\EventDetection\OnFeatures\onFeatures.mat
-fullOnSet = prtDataSetClass();
+load onFeatures;
 fullOnSet = onFeatures;
 
-load ..\EventDetection\pcaON.mat
-
-maxONSlope = max(fullOnSet.data(:,2));
+maxONSlope = max(fullOnSet.data(:,1));
 maxONDelta = max(fullOnSet.data(:,2));
 fullOnSet.data(:,1) = fullOnSet.data(:,1)/maxONSlope;
 fullOnSet.data(:,2) = fullOnSet.data(:,2)/maxONDelta;
@@ -32,7 +29,7 @@ fullOnSet.data(:,2) = fullOnSet.data(:,2)/maxONDelta;
 % hold on
 
 % Loading Off Files
-offFiles = prtUtilSubDir('OffFeatures','*.mat');
+offFiles = prtUtilSubDir('..\OffFeatures','*.mat');
 fullOffSet = prtDataSetClass();
 for iFile = 1:length(offFiles)
     %cFile = offFiles{iFile};
@@ -65,7 +62,7 @@ myOn = onEvents;
 myOff = offEvents;
 myEvents = allEvents;
 
-trainingWindow = 30;
+trainingWindow = 10;
 
 % The below line makes two vectors which, when the classification ends,
 % ideally the the on events will correspond to their specific dcIDs and so
@@ -85,66 +82,56 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
     if myOn(i) == 1
         %knnClassOut = DisagClassifier(aggregatePower, knnClassifierOn, i, trainingWindow);
         eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow);
-        c = median(find(eventWindow));
-        window1 = eventWindow(c-10:c+10);
-        eventSlope = polyfit(1:length(window1),window1,1)/maxONSlope;
-        eventDelta = (max(window1) - min(window1))/maxONDelta;
-        eventPCAwindow = prtDataSetClass;
-        eventPCAwindow.data = eventWindow;
-        pcaONFeature = pcaON.run(eventPCAwindow);
-        eventFeatures = prtDataSetClass([pcaONFeature.data(1,1) eventSlope(1) eventDelta]);
+        eventSlope = polyfit(1:length(eventWindow),eventWindow,1)/maxONSlope;
+        eventDelta = (max(eventWindow) - min(eventWindow))/maxONDelta;
+        eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
         %eventFeatures = prtDataSetClass(eventWindow);
         knnClassOut = knnClassifierOn.run(eventFeatures);
         [~, dcsID] = max(knnClassOut.data);
         
-%         if dcsID == 1;
-%             index = 1;
-%         elseif dcsID == 2;
-%             index = 5;
-%         elseif dcsID == 3;
-%             index = 7;
-%         elseif dcsID == 4;
-%             index = 9;
-%         %elseif dcsID == 5;
-%         %    index = 9;
-%         end
+        if dcsID == 1;
+            index = 1;
+        elseif dcsID == 2;
+            index = 2;
+        elseif dcsID == 3;
+            index = 3;
+        elseif dcsID == 4;
+            index = 4;
+        end
         
-%         filterFrom = fullOnSet;
-%         filterFeatures = filterFrom.retainClasses(dcsID);
+        filterFrom = fullOnSet;
+        filterFeatures = filterFrom.retainClasses(index);
             
-%         distance = prtDistanceEuclidean(eventFeatures,filterFeatures);
-%         maxDistance = max(distance);
-%         meanDistance = mean(distance);
-%         chebDistance = prtDistanceChebychev(eventFeatures,filterFeatures);
-%         maxChebDistance = max(chebDistance);
-%         meanChebDistance = mean(chebDistance);
-%         MaxDistance = [MaxDistance maxDistance];
-%         MeanDistance = [MeanDistance meanDistance];
-%         MaxChebDistance = [MaxChebDistance maxChebDistance];
-%         MeanChebDistance = [MeanChebDistance meanChebDistance];
-%         
-%         % Printing Out Appliance Classification
-%         if or(dcsID == 3, dcsID == 4)
+        distance = prtDistanceEuclidean(eventFeatures,filterFeatures);
+        maxDistance = max(distance);
+        meanDistance = mean(distance);
+        chebDistance = prtDistanceChebychev(eventFeatures,filterFeatures);
+        maxChebDistance = max(chebDistance);
+        meanChebDistance = mean(chebDistance);
+        MaxDistance = [MaxDistance maxDistance];
+        MeanDistance = [MeanDistance meanDistance];
+        MaxChebDistance = [MaxChebDistance maxChebDistance];
+        MeanChebDistance = [MeanChebDistance meanChebDistance];
+        
+        % Printing Out Appliance Classification
+        if or(dcsID == 3, dcsID == 4)
 %             if and(dcsID == 3, maxDistance > 0.1)
 %                 ONdcsID(i) = dcsID + 1;
 %             else
+                ONdcsID(i) = dcsID;
+%             end
+%         elseif dcsID == 1
+%             if meanDistance < 0.015
 %                 ONdcsID(i) = dcsID;
 %             end
-% %         elseif dcsID == 1
-% %             if meanDistance < 0.015
-% %                 ONdcsID(i) = dcsID;
-% %             end
-%          elseif meanDistance < 0.005;
-%              ONdcsID(i) = dcsID; % Classifies the ith detected on-event
-%         end
-%         count = count + 1;
-        
-
-        ONdcsID(i) = dcsID;
+         elseif meanDistance < 0.005;
+             ONdcsID(i) = dcsID; % Classifies the ith detected on-event
+        end
+        count = count + 1;
         
 %         figure(1)
 %         hold on
-%         featurePoint = plot(eventSlope(1),eventDelta,'o','MarkerSize',100);
+%         featurePoint = plot(eventSlope(1),eventDelta,'xk','MarkerSize',100);
 %         set(featurePoint,'xdata',eventSlope(1),'ydata',eventDelta);
 %         dcsID
 %         delete(featurePoint);
@@ -156,7 +143,7 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
         eventDelta = max(eventWindow) - min(eventWindow);
         eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
         %eventFeatures = prtDataSetClass(eventWindow);
-        knnClassOut = knnClassifierOff.run(eventFeatures);
+        knnClassOut = knnClassifierOn.run(eventFeatures);
         [~, dcsID] = max(knnClassOut.data);
         
         % Printing Out Appliance Classification

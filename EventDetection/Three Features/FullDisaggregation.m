@@ -15,21 +15,23 @@ function [ ONdcsID, OFFdcsID, TOTdcsID, MaxChebDistance, MeanChebDistance, MaxDi
 %     fullOnSet = catObservations(fullOnSet, onFeatureSet);
 %     %plot(onFeatureSet)
 % end
-
-load ..\EventDetection\OnFeatures\onFeatures.mat
-fullOnSet = prtDataSetClass();
+load ..\EventDetection\DELETE.mat
+%load ..\EventDetection\OnFeatures\onFeatures.mat
 fullOnSet = onFeatures;
 
 load ..\EventDetection\pcaON.mat
 
+%lengthPCAONAbsolute = max(fullOnSet.data(:,1)) - min(fullOnSet.data(:,1));
+%shiftPCAON = -min(fullOnSet.data(:,1));
 maxONSlope = max(fullOnSet.data(:,2));
 maxONDelta = max(fullOnSet.data(:,3));
+fullOnSet.data(:,1) = (fullOnSet.data(:,1))%+shiftPCAON)/lengthPCAONAbsolute;
 fullOnSet.data(:,2) = fullOnSet.data(:,2)/maxONSlope;
 fullOnSet.data(:,3) = fullOnSet.data(:,3)/maxONDelta;
 
-% figure(1)
-% plot(fullOnSet)
-% hold on
+figure(1)
+plot(fullOnSet)
+hold on
 
 % Loading Off Files
 offFiles = prtUtilSubDir('OffFeatures','*.mat');
@@ -39,8 +41,6 @@ for iFile = 1:length(offFiles)
     load(offFiles{iFile});
     fullOffSet = catObservations(fullOffSet, offFeatureSet);
 end
-
-
 
 %trainKNNClassifier
 
@@ -90,11 +90,14 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
         eventSlope = polyfit(1:length(window1),window1,1)/maxONSlope;
         eventDelta = (max(window1) - min(window1))/maxONDelta;
         eventPCAwindow = prtDataSetClass;
-        eventPCAwindow.data = eventWindow;
+        eventPCAwindow.data = (eventWindow - mean(eventWindow));
         pcaONFeature = pcaON.run(eventPCAwindow);
+        %pcaONFeature.data = (pcaONFeature.data+shiftPCAON)/lengthPCAONAbsolute;
+        [pcaONFeature.data(1,1) eventSlope(1) eventDelta]
         eventFeatures = prtDataSetClass([pcaONFeature.data(1,1) eventSlope(1) eventDelta]);
         %eventFeatures = prtDataSetClass(eventWindow);
         knnClassOut = knnClassifierOn.run(eventFeatures);
+        knnClassOut.data
         [~, dcsID] = max(knnClassOut.data);
         
 %         if dcsID == 1;
@@ -142,12 +145,12 @@ for i = (1 + trainingWindow):(dataLength-trainingWindow)
 
         ONdcsID(i) = dcsID;
         
-%         figure(1)
-%         hold on
-%         featurePoint = plot(eventSlope(1),eventDelta,'o','MarkerSize',100);
-%         set(featurePoint,'xdata',eventSlope(1),'ydata',eventDelta);
-%         dcsID
-%         delete(featurePoint);
+        figure(1)
+        hold on
+        featurePoint = plot(eventSlope(1),eventDelta,'xk','MarkerSize',100);
+        set(featurePoint,'xdata',eventSlope(1),'ydata',eventDelta);
+        dcsID
+        delete(featurePoint);
         
     elseif myOff(i) == 1
         %knnClassOut = DisagClassifier(aggregatePower, knnClassifierOff, i, trainingWindow);

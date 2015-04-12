@@ -175,7 +175,6 @@ hold off
 
 %% Disaggregate and get dcsIDs
 [ ONdcsID, OFFdcsID, TOTdcsID, MaxChebDistance, MeanChebDistance, MaxDistance, MeanDistance ] = FullDisaggregation( agg, onEventsAgg, offEventsAgg, allEventsAgg );
-
 %% Create guess dcsID vector
 guessOnDCSID = ONdcsID;
 % Remove non-events
@@ -291,3 +290,4 @@ guessOn.targets = truthOnDCSID';
 guessOn.data = guessOnDCSID';
 figure(13)
 prtScoreConfusionMatrix(guessOn,truthOn)
+axis square
