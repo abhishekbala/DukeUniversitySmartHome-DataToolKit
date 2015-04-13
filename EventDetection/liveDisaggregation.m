@@ -55,10 +55,9 @@ knnClassifierOff = knnClassifierOff.train(fullOffSet);
 Pmax = 2;
 dcsID = 0;
 
-
 % Creating fixed variables: myOn, myOff, myEvents
 liveData = importdata('../dataCollectors/shData.csv');
-aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
+aggregatePower = sum(liveData(:,2:3),2); %- sum(liveData(:,4:5),2);
 
 if(size(aggregatePower, 1) == 1 && size(aggregatePower, 2) ~= 1) % Making sure data is in right format
     aggregatePower = aggregatePower';
@@ -82,7 +81,7 @@ eventTimeStamp = [];
 while (~FS.Stop())
     liveData = importdata('../dataCollectors/shData.csv');
     unixTime = liveData(:,1);
-    aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
+    aggregatePower = sum(liveData(:,2:3),2);% - sum(liveData(:,4:5),2);
     dataLength = length(aggregatePower);
     
     if (length(myOn) < dataLength)
