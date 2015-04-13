@@ -6,7 +6,7 @@ csvwrite('eventData.csv',M);
 
 % Create figures to call later
 figure1 = figure('CloseRequestFcn',@figureCloseReq);
-%figure1.WindowStyle = 'docked';
+figure1.WindowStyle = 'docked';
 drawnow;
 
 % Loading On Files
@@ -58,7 +58,7 @@ dcsID = 0;
 
 % Creating fixed variables: myOn, myOff, myEvents
 liveData = importdata('../dataCollectors/shData.csv');
-aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5));
+aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
 
 if(size(aggregatePower, 1) == 1 && size(aggregatePower, 2) ~= 1) % Making sure data is in right format
     aggregatePower = aggregatePower';
@@ -82,7 +82,7 @@ eventTimeStamp = [];
 while (~FS.Stop())
     liveData = importdata('../dataCollectors/shData.csv');
     unixTime = liveData(:,1);
-    aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5));
+    aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
     dataLength = length(aggregatePower);
     
     if (length(myOn) < dataLength)
@@ -184,8 +184,6 @@ while (~FS.Stop())
             distance = prtDistanceEuclidean(eventFeatures,filterFeatures);
             maxDistanceON = max(distance);
             meanDistanceON = mean(distance);
-            MaxDistanceON = [MaxDistanceON maxDistanceON];
-            MeanDistanceON = [MeanDistanceON meanDistanceON];
             
             if and(~or(dcsID == 3, dcsID == 4), meanDistanceON > 0.005)
                 dcsID = 0; % Classifies the ith detected on-event as OTHER
@@ -216,8 +214,6 @@ while (~FS.Stop())
             distance = prtDistanceEuclidean(eventFeatures,filterFeatures);
             maxDistanceOFF = max(distance);
             meanDistanceOFF = mean(distance);
-            MaxDistanceOFF = [MaxDistanceOFF maxDistanceOFF];
-            MeanDistanceOFF = [MeanDistanceOFF meanDistanceOFF];
             
             % Printing Out Appliance Classification
             if and(~or(dcsID == 3, dcsID == 4), meanDistanceOFF > 0.005)
