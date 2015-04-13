@@ -24,9 +24,9 @@ maxONDelta = max(fullOnSet.data(:,2));
 fullOnSet.data(:,1) = fullOnSet.data(:,1)/maxONSlope;
 fullOnSet.data(:,2) = fullOnSet.data(:,2)/maxONDelta;
 
-% figure(1)
-% plot(fullOnSet)
-% hold on
+figure(1)
+plot(fullOnSet)
+hold on
 
 % Loading Off Files
 % offFiles = prtUtilSubDir('..\OffFeatures','*.mat');
@@ -44,9 +44,9 @@ maxOFFDelta = max(fullOffSet.data(:,2));
 fullOffSet.data(:,1) = fullOffSet.data(:,1)/minOFFSlope;
 fullOffSet.data(:,2) = fullOffSet.data(:,2)/maxOFFDelta;
 
-% figure(2)
-% plot(fullOffSet)
-% hold on
+figure(2)
+plot(fullOffSet)
+hold on
 
 %trainKNNClassifier
 

@@ -1,8 +1,8 @@
 function liveDisaggregation()
 
 % Create an output CSV file
-M = zeros(1,4);
-csvwrite('eventData.csv',M);
+M = zeros(1,5);
+csvwrite(eve
 
 % Create figures to call later
 figure1 = figure('CloseRequestFcn',@figureCloseReq);
@@ -196,8 +196,6 @@ while (~FS.Stop())
             appID = [appID dcsID];
             eventTimeStamp = [eventTimeStamp unixTime(i)];
             eventType = [eventType 1];
-            M = [unixTime(i) dcsID eventDelta 1];
-            dlmwrite('eventData.csv',M,'-append','newline','pc');
             
             % The below code works while live:
             % text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
@@ -229,9 +227,6 @@ while (~FS.Stop())
             appID = [appID dcsID];
             eventTimeStamp = [eventTimeStamp unixTime(i)];
             eventType = [eventType 0];
-            
-            M = [unixTime(i) dcsID eventDelta 1];
-            dlmwrite('eventData.csv',M,'-append','newline','pc');
             
             % The below code works while live:
             % text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
