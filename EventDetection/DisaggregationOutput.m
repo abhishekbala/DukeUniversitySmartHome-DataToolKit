@@ -33,8 +33,6 @@ FridgeMatrix = BuildMatrix(1, numberFridgeEvents, fridgeTimes, eventTimeStamps, 
 HotBoxMatrix = BuildMatrix(2, numberHotBoxEvents, hotBoxTimes, eventTimeStamps, deltaPowerValues, eventStatusValues);
 HVACMode1Events = BuildMatrix(3, numberHVACMode1Events, HVACMode1Times, eventTimeStamps, deltaPowerValues, eventStatusValues);
 HVACMode2Events = BuildMatrix(4, numberHVACMode2Events, HVACMode2Times, eventTimeStamps, deltaPowerValues, eventStatusValues);
-
-
 end
 
 function TimeSeriesCreate(ApplianceMatrix)
