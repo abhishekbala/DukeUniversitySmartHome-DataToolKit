@@ -22,9 +22,10 @@ for iSecond=1:lengthOfData
         minutes(iMinute,3) = mean(secondData(iSecond-59,iSecond,3));
         minutes(iMinute,4) = mean(secondData(iSecond-59,iSecond,4));
         iMinute = iMinute + 1;
+        minuteTime = time;
     end
 end
 
-csvEndRow = csvStartRow + lengthOfData;
+csvEndRow = csvStartRow + minuteTime;
 save('csvEndRow');
 dlmwrite('minuteData.csv',minutes,'-append');
