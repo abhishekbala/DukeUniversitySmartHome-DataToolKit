@@ -1,4 +1,4 @@
-function trainingFeatureExtraction2(trainingDataSet, applianceLabel, decisionIDs, parameters)
+function training2Features(trainingDataSet, applianceLabel, decisionIDs, parameters)
 
     dataLength = length(trainingDataSet);
     
@@ -12,7 +12,7 @@ function trainingFeatureExtraction2(trainingDataSet, applianceLabel, decisionIDs
     g = parameters(7);
     [on, off, events] = GLR_EventDetection(trainingDataSet, a, b, c, d, e, f, g);
 
-    trainingWindow = 30;
+    trainingWindow = 10;
     onFilePath = cat(2, applianceLabel, 'OnFeatures.mat');
     offFilePath = cat(2, applianceLabel, 'OffFeatures.mat');
     
@@ -33,17 +33,9 @@ function trainingFeatureExtraction2(trainingDataSet, applianceLabel, decisionIDs
     for i = 1:dataLength
         if on(i) == 1
             eventWindow = trainingDataSet(i-trainingWindow:i+trainingWindow)';
-            eventBefore = eventWindow(1:trainingWindow);
-            eventAfter = eventWindow(trainingWindow+1:trainingWindow*2);
+            eventSlope = polyfit(1:21,eventWindow,1);
             eventDelta = max(eventWindow) - min(eventWindow);
-            eventCenter = mean(eventBefore) + eventDelta / 2;
-            eventBeforeAppend = [eventBefore eventCenter];
-            eventAfterAppend = [eventCenter eventAfter];
-            regressionBefore = polyfit(1:trainingWindow+1, eventBeforeAppend, 1);
-            regressionAfter = polyfit(trainingWindow+1:trainingWindow*2+1, eventAfterAppend, 1);
-            slopeBefore = regressionBefore(1);
-            slopeAfter = regressionAfter(1);
-            eventFeatures = prtDataSetClass([slopeBefore slopeAfter eventDelta],decisionIDs(1));
+            eventFeatures = prtDataSetClass([eventSlope(1) eventDelta],decisionIDs(1));
             if onExist == 1
                 onFeatureSet = catObservations(onFeatureSet, eventFeatures);
             else 
@@ -51,23 +43,14 @@ function trainingFeatureExtraction2(trainingDataSet, applianceLabel, decisionIDs
                 onExist = 1;
             end
         end
-        
         if off(i) == 1
             eventWindow = trainingDataSet(i-trainingWindow:i+trainingWindow)';
-            eventBefore = eventWindow(1:trainingWindow);
-            eventAfter = eventWindow(trainingWindow+1:trainingWindow*2);
+            eventSlope = polyfit(1:21,eventWindow,1);
             eventDelta = max(eventWindow) - min(eventWindow);
-            eventCenter = mean(eventBefore) + eventDelta / 2;
-            eventBeforeAppend = [eventBefore eventCenter];
-            eventAfterAppend = [eventCenter eventAfter];
-            regressionBefore = polyfit(1:trainingWindow+1, eventBeforeAppend, 1);
-            regressionAfter = polyfit(trainingWindow+1:trainingWindow*2+1, eventAfterAppend, 1);
-            slopeBefore = regressionBefore(1);
-            slopeAfter = regressionAfter(1);
-            eventFeatures = prtDataSetClass([slopeBefore slopeAfter eventDelta],decisionIDs(1));
+            eventFeatures = prtDataSetClass([eventSlope(1) eventDelta],decisionIDs(2));
             if offExist == 1
                 offFeatureSet = catObservations(offFeatureSet, eventFeatures);
-            else 
+            else
                 offFeatureSet = eventFeatures;
                 offExist = 1;
             end
