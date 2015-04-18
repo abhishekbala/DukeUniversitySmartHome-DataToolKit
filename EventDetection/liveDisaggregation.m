@@ -1,35 +1,19 @@
 function liveDisaggregation()
+% Input: CSV file with Live Smart home data
+% Output: CSV file with timestamp of event, event labels (ON/OFF),
+% appliance ID, Delta Power
 
-% Create an output CSV file
+% Create an output CSV file in the home directory
 M = zeros(1,4);
 csvwrite('eventData.csv',M);
 
-% Create figures to call later
+% Create figures to call later 
 figure1 = figure('CloseRequestFcn',@figureCloseReq);
-figure1.WindowStyle = 'docked';
+%figure1.WindowStyle = 'docked';
 drawnow;
-
-% Loading On Files
-% onFiles = prtUtilSubDir('OnFeatures','*.mat');
-% fullOnSet = prtDataSetClass();
-% for iFile = 1:length(onFiles)
-%     %cFile = onFiles{iFile};
-%     load(onFiles{iFile});
-%     fullOnSet = catObservations(fullOnSet, onFeatureSet);
-%     %plot(onFeatureSet)
-% end
 
 load ..\EventDetection\OnFeatures\onFeatures.mat
 fullOnSet = onFeatures;
-
-% % Loading Off Files
-% offFiles = prtUtilSubDir('OffFeatures','*.mat');
-% fullOffSet = prtDataSetClass();
-% for iFile = 1:length(offFiles)
-%     %cFile = offFiles{iFile};
-%     load(offFiles{iFile});
-%     fullOffSet = catObservations(fullOffSet, offFeatureSet);
-% end
 
 load ..\EventDetection\OffFeatures\offFeatures.mat
 fullOffSet = offFeatures;
@@ -57,7 +41,7 @@ dcsID = 0;
 
 % Creating fixed variables: myOn, myOff, myEvents
 liveData = importdata('../dataCollectors/shData.csv');
-aggregatePower = sum(liveData(:,2:3),2); %- sum(liveData(:,4:5),2);
+aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
 
 if(size(aggregatePower, 1) == 1 && size(aggregatePower, 2) ~= 1) % Making sure data is in right format
     aggregatePower = aggregatePower';
@@ -81,7 +65,7 @@ eventTimeStamp = [];
 while (~FS.Stop())
     liveData = importdata('../dataCollectors/shData.csv');
     unixTime = liveData(:,1);
-    aggregatePower = sum(liveData(:,2:3),2);% - sum(liveData(:,4:5),2);
+    aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
     dataLength = length(aggregatePower);
     
     if (length(myOn) < dataLength)
@@ -151,7 +135,7 @@ while (~FS.Stop())
     % Plotting
     clf; % Clear Relevant Figures
     % Call Figure 1 and update without stealing focus
-    changeFigure(figure1);
+    set(0,'CurrentFigure',figure1)
     hold on;
     plot(aggregatePower);
     plotMyOn = myOn;
@@ -160,11 +144,11 @@ while (~FS.Stop())
     plotMyOff(plotMyOff == 0) = NaN;
     plot(plotMyOn.*aggregatePower, 'ro', 'linewidth', 2);
     plot(plotMyOff.*aggregatePower, 'go', 'linewidth', 2);
-    hold off;
     title('Events detected');
     xlabel('Time Series Values (s)');
     ylabel('Power Values (W)');
     legend('Data', 'On Events', 'Off Events');
+    hold off;
     
     % Disaggregation
     for i = (1 + trainingWindow):(dataLength-trainingWindow)
@@ -238,5 +222,5 @@ while (~FS.Stop())
 end
 FS.Clear();
 clear FS;
-appLabels
+%appLabels
 end

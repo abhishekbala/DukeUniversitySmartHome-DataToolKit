@@ -13,4 +13,4 @@ for iSecond=1:length(secondData)
     end
 end
 
-dlmwrite('data.csv',minutes);
+dlmwrite('dataminutes.csv',minutes);
