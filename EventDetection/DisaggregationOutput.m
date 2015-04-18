@@ -78,6 +78,13 @@ end
 
 end
 
+<<<<<<< HEAD
+% Create corresponding matrices for each appliance
+FridgeMatrix = BuildMatrix(1, numberFridgeEvents, fridgeTimes, eventTimeStamps, deltaPowerValues, eventStatusValues);
+HotBoxMatrix = BuildMatrix(2, numberHotBoxEvents, hotBoxTimes, eventTimeStamps, deltaPowerValues, eventStatusValues);
+HVACMode1Events = BuildMatrix(3, numberHVACMode1Events, HVACMode1Times, eventTimeStamps, deltaPowerValues, eventStatusValues);
+HVACMode2Events = BuildMatrix(4, numberHVACMode2Events, HVACMode2Times, eventTimeStamps, deltaPowerValues, eventStatusValues);
+=======
 function [ApplianceTimePoint, pointer] = TimeSeriesCreate2(ApplianceMatrix, avgOnPower, myTimeVector, pointerStatus)
 [matxSize, ~] = size(ApplianceMatrix);
 onOffStatus = ApplianceMatrix(matxSize, 4);
@@ -105,6 +112,7 @@ elseif(pointerStatus == 1 && onOffStatus == -1)
     pointer = 0;
 end
 
+>>>>>>> origin/master
 end
 
 function [ApplianceTimeSeries, pointer] = TimeSeriesCreate(ApplianceMatrix, avgOnPower, myTimeVector, pointerStatus)
