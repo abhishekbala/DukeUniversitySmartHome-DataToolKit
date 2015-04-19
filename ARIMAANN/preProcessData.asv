@@ -1,0 +1,8 @@
+function processedData = preProcessData(recentData)
+% Applies two functions to preprocess data:
+%   fixMissingValues
+%   MinuteAverageFromSecondData
+
+
+
+end
