@@ -5,19 +5,20 @@ function liveDisaggregation()
 
 % Create an output CSV file in the home directory
 M = zeros(1,4);
-csvwrite('eventData.csv',M);
+csvwrite('eventData.csv', M);
 
 % Create figures to call later 
 figure1 = figure('CloseRequestFcn',@figureCloseReq);
-%figure1.WindowStyle = 'docked';
+figure1.WindowStyle = 'docked';
 drawnow;
 
+% Load ON and OFF features
 load ..\EventDetection\OnFeatures\onFeatures.mat
 fullOnSet = onFeatures;
-
 load ..\EventDetection\OffFeatures\offFeatures.mat
 fullOffSet = offFeatures;
 
+% Normalise feature space
 maxONSlope = max(fullOnSet.data(:,1));
 maxONDelta = max(fullOnSet.data(:,2));
 fullOnSet.data(:,1) = fullOnSet.data(:,1)/maxONSlope;
@@ -28,7 +29,7 @@ maxOFFDelta = max(fullOffSet.data(:,2));
 fullOffSet.data(:,1) = fullOffSet.data(:,1)/minOFFSlope;
 fullOffSet.data(:,2) = fullOffSet.data(:,2)/maxOFFDelta;
 
-%
+%Train KNN Classifier
 knnClassifierOn = prtClassKnn;
 knnClassifierOn.k = 5;
 knnClassifierOn = knnClassifierOn.train(fullOnSet);
@@ -41,9 +42,9 @@ dcsID = 0;
 
 % Creating fixed variables: myOn, myOff, myEvents
 liveData = importdata('../dataCollectors/shData.csv');
-aggregatePower = sum(liveData(:,2:3),2)% - sum(liveData(:,4:5),2);
+aggregatePower = sum(liveData(:,2:3),2);% - sum(liveData(:,4:5),2);
 
-if(size(aggregatePower, 1) == 1 && size(aggregatePower, 2) ~= 1) % Making sure data is in right format
+if(size(aggregatePower, 1) == 1 && size(aggregatePower, 2) ~= 1); % Making sure data is in right format
     aggregatePower = aggregatePower';
 end
 
@@ -65,14 +66,14 @@ eventTimeStamp = [];
 while (~FS.Stop())
     liveData = importdata('../dataCollectors/shData.csv');
     unixTime = liveData(:,1);
-    aggregatePower = sum(liveData(:,2:3),2)% - sum(liveData(:,4:5),2);
+    aggregatePower = sum(liveData(:,2:3),2);% - sum(liveData(:,4:5),2);
     dataLength = length(aggregatePower);
     
-    if (length(myOn) < dataLength)
+    if (length(myOn) < dataLength);
         myOn(dataLength) = 0; % Matlab code automatically fills in zeros in between
         myOff(dataLength) = 0;
         myEvents(dataLength) = 0;
-    elseif (length(myOn) > dataLength)
+    elseif (length(myOn) > dataLength);
         delta = length(myOn) - dataLength;
         myOn(1:delta) = []; % Truncates data based on python
         myOff(1:delta) = [];
@@ -88,7 +89,7 @@ while (~FS.Stop())
     
     myMax = max([maxOn maxOff]);
     
-    if(isempty(myMax))
+    if(isempty(myMax));
         myMax = 0;
     end
     
@@ -151,7 +152,7 @@ while (~FS.Stop())
     hold off;
     
     % Disaggregation
-    for i = (1 + trainingWindow):(dataLength-trainingWindow)
+    for i = (1 + trainingWindow):(dataLength-trainingWindow);
         
         if onDummy(i) == 1
             eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
@@ -168,7 +169,7 @@ while (~FS.Stop())
             maxDistanceON = max(distance);
             meanDistanceON = mean(distance);
             
-            if and(~or(dcsID == 3, dcsID == 4), meanDistanceON > 0.005)
+            if and(~or(dcsID == 3, dcsID == 4), meanDistanceON > 0.005);
                 dcsID = 0; % Classifies the ith detected on-event as OTHER
             end
             
@@ -182,8 +183,7 @@ while (~FS.Stop())
             
             % The below code works while live:
             % text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
-        end
-        if offDummy(i) == 1
+        elseif offDummy(i) == 1
             eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
             eventSlope = polyfit(1:length(eventWindow),eventWindow,1)/minOFFSlope;
             eventDelta = max(eventWindow) - min(eventWindow)/maxOFFDelta;
@@ -214,7 +214,11 @@ while (~FS.Stop())
             
             % The below code works while live:
             % text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
+        else 
+            M = [unixTime(i) 0 0 0];
+            dlmwrite('eventData.csv',M,'-append','newline','pc');
         end
+        
     end
 
     % 1 second pause
