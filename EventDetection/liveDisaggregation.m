@@ -156,7 +156,7 @@ while (~FS.Stop())
 %     hold off;
 
     % Disaggregation
-    for i = (i + windowLength):(dataLength-windowLength);
+    for i = (1 + windowLength):(dataLength-windowLength);
         
         if onDummy(i) == 1
             eventWindow = aggregatePower(i-windowLength:i+windowLength)';
