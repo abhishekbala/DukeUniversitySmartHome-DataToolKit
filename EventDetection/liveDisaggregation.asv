@@ -63,7 +63,7 @@ FS = stoploop({'Click me to:', 'Exit out of the Loop'});
 appID = [];
 eventType = [];
 eventTimeStamp = [];
-d = 1;
+
 % Main Loop: 
 while (~FS.Stop())
     liveData = importdata('../dataCollectors/shData.csv');
@@ -156,7 +156,7 @@ while (~FS.Stop())
 %     hold off;
 
     % Disaggregation
-    for i = (i + windowLength):(dataLength-windowLength);
+    for i = (d + windowLength):(dataLength-windowLength);
         
         if onDummy(i) == 1
             eventWindow = aggregatePower(i-windowLength:i+windowLength)';
@@ -184,13 +184,8 @@ while (~FS.Stop())
             appID = [appID dcsID];
             eventTimeStamp = [eventTimeStamp unixTime(i)];
             eventType = [eventType 1];
-            
-            if d ~= unixTime(i)
-                M = [unixTime(i) dcsID eventDelta 1];
-                dlmwrite('eventData.csv',M,'-append','newline','pc');
-            end
-            
-            d = unixTime(i);
+            M = [unixTime(i) dcsID eventDelta 1];
+            dlmwrite('eventData.csv',M,'-append','newline','pc');
             
             % The below code works while live:
             %plotID = text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
@@ -223,20 +218,19 @@ while (~FS.Stop())
             eventTimeStamp = [eventTimeStamp unixTime(i)];
             eventType = [eventType 0];
             
-            if d~= unixTime(i);
-                M = [unixTime(i) dcsID eventDelta 0];
-                dlmwrite('eventData.csv',M,'-append','newline','pc');
-            end
-            d = unixTime(i);
+            M = [unixTime(i) dcsID eventDelta 0];
+            dlmwrite('eventData.csv',M,'-append','newline','pc');
+            
             % The below code works while live:
             %plotID = text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
             
-        elseif d~= unixTime(i) 
+        else 
             M = [unixTime(i) 0 0 0];
             dlmwrite('eventData.csv',M,'-append','newline','pc');
-            d = unixTime(i);
-        end 
+        end
+        
     end
+    d = 
     % 120 second pause
      pause(120)
 end
