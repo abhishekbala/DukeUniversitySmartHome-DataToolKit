@@ -8,9 +8,9 @@ M = zeros(1,4);
 csvwrite('eventData.csv', M);
 
 % Create figures to call later 
-figure1 = figure('CloseRequestFcn',@figureCloseReq);
-figure1.WindowStyle = 'docked';
-drawnow;
+% figure1 = figure('CloseRequestFcn',@figureCloseReq);
+% figure1.WindowStyle = 'docked';
+% drawnow;
 
 % Load ON and OFF features
 load ..\EventDetection\OnFeatures\onFeatures.mat
@@ -37,127 +37,131 @@ knnClassifierOn = knnClassifierOn.train(fullOnSet);
 knnClassifierOff = prtClassKnn;
 knnClassifierOff.k = 5;
 knnClassifierOff = knnClassifierOff.train(fullOffSet);
-Pmax = 2;
-dcsID = 0;
+
+%Pmax = 2;
+%dcsID = 0;
 
 % Creating fixed variables: myOn, myOff, myEvents
 liveData = importdata('../dataCollectors/shData.csv');
-aggregatePower = sum(liveData(:,2:3),2);% - sum(liveData(:,4:5),2);
+aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
 
 if(size(aggregatePower, 1) == 1 && size(aggregatePower, 2) ~= 1); % Making sure data is in right format
     aggregatePower = aggregatePower';
 end
 
-myOn = zeros(size(aggregatePower));
-myOff = zeros(size(aggregatePower));
-myEvents = zeros(size(aggregatePower));
+onIndicator = zeros(size(aggregatePower));
+offIndicator = zeros(size(aggregatePower));
+eventIndicator = zeros(size(aggregatePower));
 
 % Indicator of 1st loop:
-myIndicator = 0;
+indicator = 0;
 
 % Create a stop loop:
 FS = stoploop({'Click me to:', 'Exit out of the Loop'});
 
-% Create vector storing Appliance IDs for every event
+% Create vector storing Appliance IDs, Event Type and the Timestamp for every event
 appID = [];
 eventType = [];
 eventTimeStamp = [];
+
 % Main Loop: 
 while (~FS.Stop())
     liveData = importdata('../dataCollectors/shData.csv');
     unixTime = liveData(:,1);
-    aggregatePower = sum(liveData(:,2:3),2);% - sum(liveData(:,4:5),2);
+    aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
     dataLength = length(aggregatePower);
     
-    if (length(myOn) < dataLength);
-        myOn(dataLength) = 0; % Matlab code automatically fills in zeros in between
-        myOff(dataLength) = 0;
-        myEvents(dataLength) = 0;
-    elseif (length(myOn) > dataLength);
-        delta = length(myOn) - dataLength;
-        myOn(1:delta) = []; % Truncates data based on python
-        myOff(1:delta) = [];
-        myEvents(1:delta) = [];
+    % Make sure the indicator vectors are of the correct length
+    if (length(onIndicator) < dataLength);
+        % Matlab code automatically fills in zeros in between
+        onIndicator(dataLength) = 0; 
+        offIndicator(dataLength) = 0;
+        eventIndicator(dataLength) = 0;
+    elseif (length(onIndicator) > dataLength);
+        delta = length(onIndicator) - dataLength;
+        onIndicator(1:delta) = []; 
+        offIndicator(1:delta) = [];
+        eventIndicator(1:delta) = [];
     end
     
-    % Event Detection
+    % Find the last points where ON and OFF events occured
+    maxOnIndex = find(onIndicator == 1, 1, 'last');
+    maxOffInd = find(offIndicator == 1, 1, 'last');
     
-    % Max-Min Manipulations
-    
-    maxOn = find(myOn == 1, 1, 'last');
-    maxOff = find(myOff == 1, 1, 'last');
-    
-    myMax = max([maxOn maxOff]);
-    
-    if(isempty(myMax));
-        myMax = 0;
+    % Concatenate the index for On and Off
+    maxIndexVector = max([maxOnIndex maxOffInd]);
+    % Write 0 if the index vector is empty
+    if(isempty(maxIndexVector));
+        maxIndexVector = 0;
     end
     
-    if(myIndicator == 0)
+    % Make sure GLR event detection only runs from that last point an event
+    % was detected
+    if(indicator == 0)
         [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower,40,15,10,-20,0,1,4);
         on = onDummy;
         off = offDummy;
         events = eventsDummy;
-        myIndicator = 1;
+        indicator = 1;
     else
-        dataSampleLength = dataLength - myMax;
-        prev_On = myOn(1:myMax);
-        prev_Off = myOff(1:myMax);
-        prev_Events = myEvents(1:myMax);
+        dataSampleLength = dataLength - maxIndexVector;
+        prev_On = onIndicator(1:maxIndexVector);
+        prev_Off = offIndicator(1:maxIndexVector);
+        prev_Events = eventIndicator(1:maxIndexVector);
         
-        [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower((myMax+1):dataLength),40,15,10,-20,0,1,4);
+        [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower((maxIndexVector+1):dataLength),40,15,10,-20,0,1,4);
         
         on = [prev_On' onDummy];
         off = [prev_Off' offDummy];
         events = [prev_Events' eventsDummy];
         
-        onDummy = [zeros(1, myMax) onDummy];
-        offDummy = [zeros(1, myMax) offDummy];
-        eventsDummy = [zeros(1, myMax) eventsDummy];
+        onDummy = [zeros(1, maxIndexVector) onDummy];
+        offDummy = [zeros(1, maxIndexVector) offDummy];
+        eventsDummy = [zeros(1, maxIndexVector) eventsDummy];
     end
-    trainingWindow = 10;
+    
+    windowLength = 30;
     
     GLRMax = find(events == 1, 1, 'last');
-    
     if(isempty(GLRMax))
         GLRMax = 0;
     end
     
     % This section refreshes the event detection properly, ignoring
     % irrelevant points:
-    if(GLRMax > myMax)
-        on(1:maxOn) = 0;
-        off(1:maxOff) = 0;
+    if(GLRMax > maxIndexVector)
+        on(1:maxOnIndex) = 0;
+        off(1:maxOffInd) = 0;
         
-        myOn = myOn + on';
-        myOff = myOff + off';
+        onIndicator = onIndicator + on';
+        offIndicator = offIndicator + off';
     end
     
     % Plotting
-    clf; % Clear Relevant Figures
+    %clf; % Clear Relevant Figures
     % Call Figure 1 and update without stealing focus
-    set(0,'CurrentFigure',figure1)
-    hold on;
-    plot(aggregatePower);
-    plotMyOn = myOn;
-    plotMyOff = myOff;
-    plotMyOn(plotMyOn == 0) = NaN;
-    plotMyOff(plotMyOff == 0) = NaN;
-    plot(plotMyOn.*aggregatePower, 'ro', 'linewidth', 2);
-    plot(plotMyOff.*aggregatePower, 'go', 'linewidth', 2);
-    title('Events detected');
-    xlabel('Time Series Values (s)');
-    ylabel('Power Values (W)');
-    legend('Data', 'On Events', 'Off Events');
-    hold off;
+%     set(0,'CurrentFigure',figure1)
+%     hold on;
+%     plot(aggregatePower);
+%     plotOn = onIndicator;
+%     plotOff = offIndicator;
+%     plotOn(plotOn == 0) = NaN;
+%     plotOff(plotOff == 0) = NaN;
+%     plot(plotOn.*aggregatePower, 'ro', 'linewidth', 2);
+%     plot(plotOff.*aggregatePower, 'go', 'linewidth', 2);
+%     title('Events detected');
+%     xlabel('Time Series Values (s)');
+%     ylabel('Power Values (W)');
+%     legend('Data', 'On Events', 'Off Events');
+%     hold off;
     
     % Disaggregation
-    for i = (1 + trainingWindow):(dataLength-trainingWindow);
+    for i = (1 + windowLength):(dataLength-windowLength);
         
         if onDummy(i) == 1
-            eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
+            eventWindow = aggregatePower(i-windowLength:i+windowLength)';
             eventSlope = polyfit(1:length(eventWindow),eventWindow,1)/maxONSlope;
-            eventDelta = max(eventWindow) - min(eventWindow)/maxONDelta;
+            eventDelta = (max(eventWindow) - min(eventWindow))/maxONDelta;
             eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
             knnClassOut = knnClassifierOn.run(eventFeatures);
             [~, dcsID] = max(knnClassOut.data);
@@ -169,8 +173,10 @@ while (~FS.Stop())
             maxDistanceON = max(distance);
             meanDistanceON = mean(distance);
             
-            if and(~or(dcsID == 3, dcsID == 4), meanDistanceON > 0.005);
-                dcsID = 0; % Classifies the ith detected on-event as OTHER
+            if or(dcsID == 3, dcsID == 4);
+                dcsID = dcsID; % Classifies the ith detected on-event as OTHER
+            elseif meanDistanceON > 0.005
+                dcsID = 0;
             end
             
             fprintf('%1.0f is the appliance ON at time %5.3f \n', dcsID, i);
@@ -182,11 +188,12 @@ while (~FS.Stop())
             dlmwrite('eventData.csv',M,'-append','newline','pc');
             
             % The below code works while live:
-            % text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
+            %plotID = text(i,aggregatePower(i),num2str(dcsID),'Color','red','FontSize',20,'FontSmoothing','on','Margin',8);
+            
         elseif offDummy(i) == 1
-            eventWindow = aggregatePower(i-trainingWindow:i+trainingWindow)';
+            eventWindow = aggregatePower(i-windowLength:i+windowLength)';
             eventSlope = polyfit(1:length(eventWindow),eventWindow,1)/minOFFSlope;
-            eventDelta = max(eventWindow) - min(eventWindow)/maxOFFDelta;
+            eventDelta = (max(eventWindow) - min(eventWindow))/maxOFFDelta;
             eventFeatures = prtDataSetClass([eventSlope(1) eventDelta]);
             knnClassOut = knnClassifierOff.run(eventFeatures);
             [~, dcsID] = max(knnClassOut.data);
@@ -199,8 +206,10 @@ while (~FS.Stop())
             meanDistanceOFF = mean(distance);
             
             % Printing Out Appliance Classification
-            if and(~or(dcsID == 3, dcsID == 4), meanDistanceOFF > 0.005)
-                dcsID = 0; % Classifies the ith detected on-event as OTHER
+            if or(dcsID == 3, dcsID == 4);
+                dcsID = dcsID; % Classifies the ith detected on-event as OTHER
+            elseif meanDistanceOFF > 0.005
+                dcsID = 0;
             end
             
             fprintf('%1.0f is the appliance OFF at time %5.3f \n', dcsID, i);
@@ -209,11 +218,12 @@ while (~FS.Stop())
             eventTimeStamp = [eventTimeStamp unixTime(i)];
             eventType = [eventType 0];
             
-            M = [unixTime(i) dcsID eventDelta 1];
+            M = [unixTime(i) dcsID eventDelta 0];
             dlmwrite('eventData.csv',M,'-append','newline','pc');
             
             % The below code works while live:
-            % text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
+            %plotID = text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
+            
         else 
             M = [unixTime(i) 0 0 0];
             dlmwrite('eventData.csv',M,'-append','newline','pc');
