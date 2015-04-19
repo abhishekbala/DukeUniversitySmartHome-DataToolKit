@@ -60,7 +60,7 @@ function [myOutput, pointers] = DisaggregationOutput(timeVector, DisagMatrix, fu
     %[matxSize, ~] = size(DisagMatrix); % Find the length of the matrix (should be 1)
     numberAppliances = 4; 
     
-    ApplianceVector = DisagMatrix(1,:); %Find the last line of the matrix
+    ApplianceVector = DisagMatrix; %Find the last line of the matrix
     %ApplianceVector = ApplianceVector';
     
     pointers = zeros(1, numberAppliances);
@@ -103,8 +103,10 @@ if(pointerStatus == 0 && onOffStatus == 1) % PREVIOUS STATUS OF APPLIANCE IS OFF
     ApplianceTimePoint = onOffStatus * avgOnPower; % Change the appliance power output to ON
     pointer = 1; % Pointer shows that appliance is in on state.
 elseif(pointerStatus == 0 && onOffStatus == 0) % PREVIOUS STATUS OF APPLIANCE IS OFF AND CURRENT STATUS SAYS APPLIANCE STAYS IN ORIGINAL STATE
+    ApplianceTimePoint = 0; % Change the appliance power output to ON
     pointer = 0; % Pointer shows that appliance is in off state.
 elseif(pointerStatus == 0 && onOffStatus == -1) % PREVIOUS STATUS OF APPLIANCE IS OFF AND CURRENT STATUS SAYS APPLIANCE TURNS OFF
+    ApplianceTimePoint = 0;
     pointer = 0; % Pointer shows that appliance is in off state.
 elseif(pointerStatus == 1 && onOffStatus == 1) % PREVIOUS STATUS OF APPLIANCE IS ON AND CURRENT STATUS SAYS APPLIANCE TURNS ON
     ApplianceTimePoint = onOffStatus * avgOnPower; % Change the appliance power output to ON
