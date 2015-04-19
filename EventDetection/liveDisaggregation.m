@@ -173,10 +173,8 @@ while (~FS.Stop())
             maxDistanceON = max(distance);
             meanDistanceON = mean(distance);
             
-            if or(dcsID == 3, dcsID == 4);
+            if and(~or(dcsID == 3, dcsID == 4), meanDistanceON > 0.005);
                 dcsID = dcsID; % Classifies the ith detected on-event as OTHER
-            elseif meanDistanceON > 0.005
-                dcsID = 0;
             end
             
             fprintf('%1.0f is the appliance ON at time %5.3f \n', dcsID, i);
@@ -211,10 +209,8 @@ while (~FS.Stop())
             meanDistanceOFF = mean(distance);
             
             % Printing Out Appliance Classification
-            if or(dcsID == 3, dcsID == 4);
-                dcsID = dcsID; % Classifies the ith detected on-event as OTHER
-            elseif meanDistanceOFF > 0.005
-                dcsID = 0;
+            if and(~or(dcsID == 3, dcsID == 4),meanDistanceOFF > 0.005);
+                dcsID = 0; % Classifies the ith detected on-event as OTHER
             end
             
             fprintf('%1.0f is the appliance OFF at time %5.3f \n', dcsID, i);
@@ -228,6 +224,7 @@ while (~FS.Stop())
                 dlmwrite('eventData.csv',M,'-append','newline','pc');
             end
             d = unixTime(i);
+            
             % The below code works while live:
             %plotID = text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
             
