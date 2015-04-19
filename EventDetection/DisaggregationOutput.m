@@ -57,22 +57,24 @@ function [myOutput, pointers] = DisaggregationOutput(timeVector, DisagMatrix, fu
     
     % Create OUTPUT ROW!!!
     % currRowNumber = rowNumber + 1; % Update the row count to the current row
-    [matxSize, ~] = size(DisagMatrix); % Find the length of the matrix (should be 1)
+    %[matxSize, ~] = size(DisagMatrix); % Find the length of the matrix (should be 1)
+    matxSize = 1;
     numberAppliances = 4; 
     
-    ApplianceVector = DisagMatrix(matxSize, :); %Find the last line of the matrix
+    ApplianceVector = DisagMatrix(1,:); %Find the last line of the matrix
+    %ApplianceVector = ApplianceVector';
     
     pointers = zeros(1, numberAppliances);
     myOutput = zeros(1, numberAppliances + 1);
     myOutput(1) = timeVector(numel(timeVector)); % Most recent time --> a single time point
     
-    if(ApplianceVector(matxSize,2) == 1)
+    if(ApplianceVector(2) == 1)
         [myOutput(2), pointers(1)] = TimeSeriesCreate2(ApplianceVector, 500, timeVector, functionPointers(1));
-    elseif(ApplianceVector(matxSize,1) == 2)
+    elseif(ApplianceVector(2) == 2)
         [myOutput(3), pointers(2)] = TimeSeriesCreate2(ApplianceVector, 500, timeVector, functionPointers(2));
-    elseif(ApplianceVector(matxSize,2) == 3)
+    elseif(ApplianceVector(2) == 3)
         [myOutput(4), pointers(3)] = TimeSeriesCreate2(ApplianceVector, 500, timeVector, functionPointers(3));
-    elseif(ApplianceVector(matxSize,3) == 4)
+    elseif(ApplianceVector(2) == 4)
         [myOutput(5), pointers(4)] = TimeSeriesCreate2(ApplianceVector, 500, timeVector, functionPointers(4));
     end
     
@@ -83,7 +85,8 @@ function [myOutput, pointers] = DisaggregationOutput(timeVector, DisagMatrix, fu
 end
 
 function [ApplianceTimePoint, pointer] = TimeSeriesCreate2(ApplianceMatrix, avgOnPower, myTimeVector, pointerStatus)
-[matxSize, ~] = size(ApplianceMatrix);
+%[matxSize, ~] = size(ApplianceMatrix);
+matxSize = 1;
 % This gives onOffStatus in the format with 1 --> on and 0 --> off 
 onOffStatus = ApplianceMatrix(matxSize, 4);
 pointer = pointerStatus;

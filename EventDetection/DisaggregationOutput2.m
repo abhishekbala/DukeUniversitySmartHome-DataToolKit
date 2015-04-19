@@ -6,7 +6,7 @@ function DisaggregationOutput2()
 csvwrite('DisaggregatedPower.csv', []);
 
 %% Get the first time vector
-firstTimeData = importdata('../dataCollectors/shData.csv');
+firstTimeData = importdata('eventData.csv');
 [numRows, ~] = size(firstTimeData);
 functionPointers = [0, 0, 0, 0];
 
@@ -25,7 +25,7 @@ for i = 1:numRows
     %     end
     
     currentTime = firstTimeData(i,1);
-    disagMatrix = firstTimeData(:,i);
+    disagMatrix = firstTimeData(i,:);
     
     [appliancePowerOutputs, functionPointers] = DisaggregationOutput(currentTime, disagMatrix, functionPointers);
     
@@ -41,7 +41,7 @@ end
     functionPointers(appliancePowers ~= 0) = 1;
 
 while(1)
-    liveData = importdata('../dataCollectors/shData.csv');
+    liveData = importdata('eventData.csv');
     [numRows, ~] = size(liveData);
     
     currentTime = liveData(i,1);
