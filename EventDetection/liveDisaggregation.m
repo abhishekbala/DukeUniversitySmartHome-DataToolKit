@@ -237,8 +237,8 @@ while (~FS.Stop())
             d = unixTime(i);
         end 
     end
-    % 120 second pause
-     pause(120)
+    % 1 second pause
+     pause(1)
 end
 FS.Clear();
 clear FS;
