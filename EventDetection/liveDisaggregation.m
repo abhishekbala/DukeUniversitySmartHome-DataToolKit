@@ -41,7 +41,7 @@ dcsID = 0;
 
 % Creating fixed variables: myOn, myOff, myEvents
 liveData = importdata('../dataCollectors/shData.csv');
-aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
+aggregatePower = sum(liveData(:,2:3),2)% - sum(liveData(:,4:5),2);
 
 if(size(aggregatePower, 1) == 1 && size(aggregatePower, 2) ~= 1) % Making sure data is in right format
     aggregatePower = aggregatePower';
@@ -65,7 +65,7 @@ eventTimeStamp = [];
 while (~FS.Stop())
     liveData = importdata('../dataCollectors/shData.csv');
     unixTime = liveData(:,1);
-    aggregatePower = sum(liveData(:,2:3),2) - sum(liveData(:,4:5),2);
+    aggregatePower = sum(liveData(:,2:3),2)% - sum(liveData(:,4:5),2);
     dataLength = length(aggregatePower);
     
     if (length(myOn) < dataLength)
@@ -93,7 +93,7 @@ while (~FS.Stop())
     end
     
     if(myIndicator == 0)
-        [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower,80,15,10,-20,1,0,4);
+        [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower,40,15,10,-20,0,1,4);
         on = onDummy;
         off = offDummy;
         events = eventsDummy;
@@ -104,7 +104,7 @@ while (~FS.Stop())
         prev_Off = myOff(1:myMax);
         prev_Events = myEvents(1:myMax);
         
-        [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower((myMax+1):dataLength),80,15,10,-20,1,0,4);
+        [onDummy, offDummy, eventsDummy] = GLR_EventDetection(aggregatePower((myMax+1):dataLength),40,15,10,-20,0,1,4);
         
         on = [prev_On' onDummy];
         off = [prev_Off' offDummy];

@@ -1,7 +1,8 @@
 function net = Train();
-
+% Refrigerator pre is all of the timeseries data
 refrigeratorPre = importdata('shHistoricalTestDataMarch29.csv');
 refrigerator = [refrigeratorPre(:,1) refrigeratorPre(:,14)]; 
+
 HistMatPre = fixMissingValues(refrigerator);
 MinuteAverageFromSecondData(HistMatPre);
 Hist = importdata('data.csv');

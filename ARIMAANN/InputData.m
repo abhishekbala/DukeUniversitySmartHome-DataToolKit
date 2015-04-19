@@ -1,12 +1,14 @@
 function result = InputData(net)
 result = 'No Anomaly';
+% Needs to change
 load('refrigeratorContinuous.mat');
 recDisaggMatrixPre = fixMissingValues(refrigerator);
+% This has to happen outside /// from Abhishek
 MinuteAverageFromSecondData(recDisaggMatrixPre);
+% Eliminate data.csv
 recPre = importdata('data.csv');
 rec = recPre(1:end-10,2)';
 trainingData1 = recPre(1:end,2);
-
 
 %xblock1 = 1:((2345-616)/60);
 %xblock2 = 1:((3869-2345)/60);
@@ -23,7 +25,6 @@ trainingData1 = recPre(1:end,2);
 %end
 %rec = trainingData1(1:705);
 
-
 old = rec;
 oldnewlast = [];
 for i = 1:10;
@@ -35,7 +36,6 @@ y(1:size(old,2)) = old(1:end);
     %y(1:size(old,2)-1) = old(2:end);
 %end
     
-
 Ypred = num2cell(y);
 
 gotHere = 1;
@@ -50,9 +50,10 @@ oldnew = cell2mat(outputer);
 oldnewlast = oldnew(1,end);
 end
 
+% Needs to change
 old = [old oldnewlast];
 compare = trainingData1;
-predict = old(1,end-9:end)
+predict = old(1,end-9:end);
 plot(1:length(compare),compare, 4311:(length(predict)+4310),predict)%,1:length(compare),compare-std(rec), 1:length(compare),compare+std(rec))
 xlabel('Time (minutes)')
 ylabel('Refrigerator Power  (Watts)')
