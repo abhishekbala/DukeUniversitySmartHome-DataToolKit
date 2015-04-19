@@ -45,12 +45,13 @@ while(1)
     [numRows, ~] = size(liveData);
     
     currentTime = liveData(i,1);
-    disagMatrix = liveData(:,i);    
+    disagMatrix = liveData(i,1);    
     
     [appliancePowerOutputs, functionPointers] = DisaggregationOutput(currentTime, disagMatrix, functionPointers);
     
         %% CSV Write:
     dlmwrite('DisaggregatedPower.csv', appliancePowerOutputs, '-append', 'newline', 'pc');
+    pause(1)
 end
 
 end
