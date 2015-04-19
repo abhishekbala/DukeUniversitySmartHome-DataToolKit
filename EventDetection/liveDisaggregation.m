@@ -185,8 +185,8 @@ while (~FS.Stop())
             eventTimeStamp = [eventTimeStamp unixTime(i)];
             eventType = [eventType 1];
             
-            if d ~= unixTime(i)
-                M = [unixTime(i) dcsID eventDelta 1];
+            if and(d ~= unixTime(i), d < unixTime(i))
+                M = [unixTime(i) dcsID eventDelta*maxONDelta 1];
                 dlmwrite('eventData.csv',M,'-append','newline','pc');
             end
             
@@ -223,15 +223,15 @@ while (~FS.Stop())
             eventTimeStamp = [eventTimeStamp unixTime(i)];
             eventType = [eventType 0];
             
-            if d~= unixTime(i);
-                M = [unixTime(i) dcsID eventDelta 0];
+            if and(d~= unixTime(i), d < unixTime(i))
+                M = [unixTime(i) dcsID eventDelta*maxOFFDelta 0];
                 dlmwrite('eventData.csv',M,'-append','newline','pc');
             end
             d = unixTime(i);
             % The below code works while live:
             %plotID = text(i,aggregatePower(i),num2str(dcsID),'Color','green','FontSize',20,'FontSmoothing','on','Margin',8);
             
-        elseif d~= unixTime(i) 
+        elseif and(d~= unixTime(i), d < unixTime(i))
             M = [unixTime(i) 0 0 0];
             dlmwrite('eventData.csv',M,'-append','newline','pc');
             d = unixTime(i);

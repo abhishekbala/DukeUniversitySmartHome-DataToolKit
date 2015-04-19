@@ -34,23 +34,23 @@ for i = 1:numRows
 end
 
 %% Continuous Stream:
-    disaggregatedData = importdata('DisaggregatedPower.csv');
-    [numRowsDisaggregatedPower, ~] = size(disaggregatedData);
-    appliancePowers = disaggregatedData(numRowsDisaggregatedPower, :);
-    appliancePowers = appliancePowers(2:length(appliancePowers));
-    functionPointers(appliancePowers ~= 0) = 1;
-
+%     disaggregatedData = importdata('DisaggregatedPower.csv');
+%     [numRowsDisaggregatedPower, ~] = size(disaggregatedData);
+%     appliancePowers = disaggregatedData(numRowsDisaggregatedPower, :);
+%     appliancePowers = appliancePowers(2:length(appliancePowers));
+%     functionPointers(appliancePowers ~= 0) = 1;
+%     pause(1)
 while(1)
     liveData = importdata('eventData.csv');
-    [numRows, ~] = size(liveData);
-    
-    currentTime = liveData(i,1);
-    disagMatrix = liveData(i,1);    
-    
-    [appliancePowerOutputs, functionPointers] = DisaggregationOutput(currentTime, disagMatrix, functionPointers);
-    
+    [numRowsNew, ~] = size(liveData);
+    if numRowsNew > numRows + 1
+        numRows = numRows + 1;
+        currentTime = liveData(numRows,1);
+        disagMatrix = liveData(numRows,:);  
+        [appliancePowerOutputs, functionPointers] = DisaggregationOutput(currentTime, disagMatrix, functionPointers);
+        dlmwrite('DisaggregatedPower.csv', appliancePowerOutputs, '-append', 'newline', 'pc');
+    end
         %% CSV Write:
-    dlmwrite('DisaggregatedPower.csv', appliancePowerOutputs, '-append', 'newline', 'pc');
     pause(1)
 end
 
