@@ -1,11 +1,6 @@
 function result = InputDatav2(net, recPre)
 %recPre is the .mat file of input data with two columns in it -
 %preprocessed
-%result = 'No Anomaly';
-%load('refrigeratorContinuous.mat');
-%recDisaggMatrixPre = fixMissingValues(refrigerator);
-%MinuteAverageFromSecondData(recDisaggMatrixPre);
-%recPre = importdata('data.csv');
 timePredict = recPre(end-9:end, 1);
 rec = recPre(1:end-10,2)';
 alldata = recPre(1:end,2)';
