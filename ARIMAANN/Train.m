@@ -1,8 +1,9 @@
 function net = Train();
-% Refrigerator pre is all of the timeseries data
+
 refrigeratorPre = importdata('shHistoricalTestDataMarch29.csv');
 refrigerator = [refrigeratorPre(:,1) refrigeratorPre(:,14)]; 
-
+%addCols = [refrigeratorPre(:,1) refrigeratorPre(:,9)]; %forhvac
+%refrigerator = [refrigeratorBefore; addCols]; %forhvac
 HistMatPre = fixMissingValues(refrigerator);
 MinuteAverageFromSecondData(HistMatPre);
 Hist = importdata('data.csv');
@@ -49,4 +50,5 @@ net = narnet(lags, hiddenLayerSize);
 
 [inputs, inputStates, layerStates, targets] = preparets(net, {}, {}, oldSeries);
 [net, tr] = train(net, inputs, targets, inputStates, layerStates);
+save 'netHVAC2.mat' net
 end
