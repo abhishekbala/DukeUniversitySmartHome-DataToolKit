@@ -112,7 +112,7 @@ elseif(pointerStatus == 1 && onOffStatus == 1) % PREVIOUS STATUS OF APPLIANCE IS
     ApplianceTimePoint = onOffStatus * avgOnPower; % Change the appliance power output to ON
     pointer = 1; % Pointer shows that appliance is in on state.
 elseif(pointerStatus == 1 && onOffStatus == 0) % PREVIOUS STATUS OF APPLIANCE IS ON AND CURRENT STATUS SAYS APPLIANCE STAYS IN ORIGINAL STATE
-    ApplianceTimePoint = onOffStatus * avgOnPower; % Keep the appliance power output to ON.
+    ApplianceTimePoint = 0; % Keep the appliance power output to ON.
     pointer = 1;
 elseif(pointerStatus == 1 && onOffStatus == -1) % PREVIOUS STATUS OF APPLIANCE IS ON AND CURRENT STATUS SAYS APPLIANCE TURNS OFF
     ApplianceTimePoint = 0; % Change the appliance power output to OFF
