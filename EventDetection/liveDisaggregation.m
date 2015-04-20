@@ -4,6 +4,7 @@ function liveDisaggregation()
 % appliance ID, Delta Power
 
 % Create an output CSV file in the home directory
+format long
 M = zeros(1,4);
 csvwrite('eventData.csv', M);
 
@@ -185,7 +186,7 @@ while (~FS.Stop())
             
             if and(d ~= unixTime(i), d < unixTime(i))
                 M = [unixTime(i) dcsID eventDelta*maxONDelta 1];
-                dlmwrite('eventData.csv',M,'-append','newline','pc');
+                dlmwrite('eventData.csv',M,'-append','newline','pc','precision',11);
             end
             
             d = unixTime(i);
@@ -221,7 +222,7 @@ while (~FS.Stop())
             
             if and(d~= unixTime(i), d < unixTime(i))
                 M = [unixTime(i) dcsID eventDelta*maxOFFDelta 0];
-                dlmwrite('eventData.csv',M,'-append','newline','pc');
+                dlmwrite('eventData.csv',M,'-append','newline','pc','precision',11);
             end
             d = unixTime(i);
             
@@ -230,7 +231,7 @@ while (~FS.Stop())
             
         elseif and(d~= unixTime(i), d < unixTime(i))
             M = [unixTime(i) 0 0 0];
-            dlmwrite('eventData.csv',M,'-append','newline','pc');
+            dlmwrite('eventData.csv',M,'-append','newline','pc','precision',11);
             d = unixTime(i);
         end 
     end
