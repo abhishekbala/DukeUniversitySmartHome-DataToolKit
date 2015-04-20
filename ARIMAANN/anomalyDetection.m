@@ -2,14 +2,14 @@ function [refAnomalies, hotBoxAnomalies, hvacAnomalies] = anomalyDetection
     disaggregatedDataAllAppliances = csvread('..\EventDetection\DisaggregatedPower.csv');
     
     Refridge_BlockSize = 60*60*10 + 60 * 10;
-    disaggregatedDataRefridge = disaggregatedDataAllAppliances(end-Refridge_BlockSize+1:dataLength, 2);
+    disaggregatedDataRefridge = disaggregatedDataAllAppliances(end-Refridge_BlockSize+1:end, 2);
     
     HotBox_BlockSize = 60*60*12 + 60 * 10;
-    disaggregatedDataHotBox = disaggregatedDataAllAppliances(end-HotBox_BlockSize+1:dataLength, 3);
+    disaggregatedDataHotBox = disaggregatedDataAllAppliances(end-HotBox_BlockSize+1:end, 3);
     
     HVAC_BlockSize = 60*60*12 + 60 * 10;
-    disaggregatedDataHVAC = disaggregatedDataAllAppliances(end-HVAC_BlockSize+1:dataLength, 4) ...
-    + disaggregatedDataAllAppliances(dataLength-HVAC_BlockSize+1:dataLength, 5);
+    disaggregatedDataHVAC = disaggregatedDataAllAppliances(end-HVAC_BlockSize+1:end, 4) ...
+    + disaggregatedDataAllAppliances(end-HVAC_BlockSize+1:end, 5);
     
     netRef = load('netRef');
     netHotBox = load('netHotbox');
