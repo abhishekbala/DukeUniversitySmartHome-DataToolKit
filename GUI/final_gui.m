@@ -1,10 +1,10 @@
-function SmartHomeGUI
+function final_gui
 %% Initialize Data:
 clear; clc;
 
 %% Global Variables
-option = 'Refridgerator';
-load('anomalyMatrix.mat','anomalyMatrix')
+option = 'Refrigerator';
+
 %% GUI setup
 %  Create and then hide the GUI as it is being constructed.
 f = figure('Visible','off','Position',[270,1000,1200,700]);
@@ -18,16 +18,16 @@ ha = axes('Units','Pixels','Position',[150,450,600,200],'Visible','off');
 hb = axes('Units','Pixels','Position',[150, 50, 600, 200],'Visible','off');
 hpanel = uipanel('Units','Pixels','Title','Appliance Status','FontSize',20,'FontWeight','Bold',...
     'Position',[150,290,300,140],'BackgroundColor','w','FontName','Helvetica');
-hrf = uicontrol('Parent',hpanel,'Style','text','String','Refridgerator',...
-    'Position',[60,95,120,20],'FontSize',18,'FontName','Helvetica','BackgroundColor','w');
+hrf = uicontrol('Parent',hpanel,'Style','text','String','Refrigerator',...
+    'Position',[60,95,140,30],'FontSize',16,'FontName','Helvetica','BackgroundColor','w');
 hhb = uicontrol('Parent',hpanel,'Style','text','String','Hot Box',...
-    'Position',[60,65,120,20],'FontSize',18,'FontName','Helvetica','BackgroundColor','w');
-hhv1 = uicontrol('Parent',hpanel,'Style','text','String','HVAC 1',...
-    'Position',[60,35,120,20],'FontSize',18,'FontName','Helvetica','BackgroundColor','w');
-hhv2 = uicontrol('Parent',hpanel,'Style','text','String','HVAC 2',...
-    'Position',[60,5,120,20],'FontSize',18,'FontName','Helvetica','BackgroundColor','w');
+    'Position',[60,65,140,30],'FontSize',16,'FontName','Helvetica','BackgroundColor','w');
+hhv1 = uicontrol('Parent',hpanel,'Style','text','String','HVAC Mode 1',...
+    'Position',[60,35,140,30],'FontSize',16,'FontName','Helvetica','BackgroundColor','w');
+hhv2 = uicontrol('Parent',hpanel,'Style','text','String','HVAC Mode 2',...
+    'Position',[60,5,140,30],'FontSize',16,'FontName','Helvetica','BackgroundColor','w');
 hpopup = uicontrol('Style','popupmenu',...
-    'String',{'Refridgerator','Hot Box','HVAC System'},...
+    'String',{'Refrigerator','Hot Box','HVAC System'},...
     'Position',[200,230,200,50],...
     'Callback',{@popup_menu_Callback},...
     'FontSize',20);
@@ -57,8 +57,8 @@ a = 'OFF'; b ='OFF'; c ='OFF'; d = 'OFF';
         str = get(source, 'String');
         val = get(source,'Value');
         switch str{val}
-            case 'Refridgerator'
-                option = 'Refridgerator';
+            case 'Refrigerator'
+                option = 'Refrigerator';
             case 'Hot Box'
                 option = 'Hot Box';
             case 'HVAC System'
@@ -67,37 +67,46 @@ a = 'OFF'; b ='OFF'; c ='OFF'; d = 'OFF';
     end
 
 %% initial plot
-shData = importdata('../../DukeSmartHome_DataStreamDemo/dataCollectors/shData.csv');
+shData = importdata('..\dataCollectors\shData.csv');
 aggregData = shData(:,2)+shData(:,3)-shData(:,4)-shData(:,5);
 current_data = aggregData(end-299:end,1);  %% latest 300 seconds data
 current_time = shData(end-299:end,1); %% latest 300 seconds time
 
-event = importdata('../../DukeSmartHome_DataStreamDemo/EventDetection/eventData.csv');
+event = importdata('..\EventDetection\eventData.csv');
 
 greenEventTime = event(find(event(:,3)~=0&event(:,4)==1),1);
-greenEventValue = zeros(length(greenEventTime),1);
-for i = 1:length(greenEventTime)
-    greenEventValue(i,1)=current_data(find(current_time==greenEventTime(i,1)));
-end
+greenIndex = find(event(:,3)~=0&event(:,4)==1);
+greenEventValue = NaN;
+redEventValue = NaN;
 
+if current_time(1,1) < greenEventTime(1,1);
+    greenEventValue = zeros(length(greenEventTime),1);
+    for i = 1:length(greenEventTime)
+        greenEventValue(i,1)=current_data(find(current_time==greenEventTime(i,1)));
+    end
+end
 redEventTime = event(find(event(:,3)~=0&event(:,4)==0),1);
-redEventValue = zeros(length(greenEventTime),1);
-for i = 1:length(redEventTime)
-    redEventValue(i,1)=current_data(find(current_time==redEventTime(i,1)));
+redIndex = find(event(:,3)~=0&event(:,4)==0);
+if current_time(1,1) < redEventTime(1,1);
+    redEventValue = zeros(length(greenEventTime),1);
+    for i = 1:length(redEventTime)
+        redEventValue(i,1)=current_data(find(current_time==redEventTime(i,1)));
+    end
 end
 
 axes(ha);
 plot_Aggreg = plot(linspace(numel(current_data),1,numel(current_data)), current_data,'w');
-% hold on
-% plot_greenEvent = plot(greenEventTime,greenEventValue,'go');
-% plot_redEvent = plot(redEventTime,redEventValue,'ro');
-% hold off
+set(gca, 'Xdir', 'reverse');
+hold on
+plot_greenEvent = plot(greenIndex,greenEventValue,'go');
+plot_redEvent = plot(redIndex,redEventValue,'ro');
+hold off
 % halegend = legend([plot_greenEvent plot_redEvent],'ON Event','OFF Event');
 title('Smart Home Aggregate Power Data','FontSize',20,'FontWeight','bold','FontName','Helvetica');
 ylabel('Power (W)','FontSize',14);
 
 
-
+anomalyMatrix = importdata('..\ARIMAANN\anomalyMatrix.csv');
 current_actual = anomalyMatrix(:, 2);
 current_predict = anomalyMatrix(:, 3);
 axes(hb);
@@ -118,46 +127,56 @@ hold off
         
         while(get(hObject, 'Value'))         
             %% Input Data
-            shData = importdata('../../DukeSmartHome_DataStreamDemo/dataCollectors/shData.csv');
+            shData = importdata('..\dataCollectors\shData.csv');
             aggregData = shData(:,2)+shData(:,3)-shData(:,4)-shData(:,5);
             current_data = aggregData(end-299:end,1);  %% latest 300 seconds data
             current_time = shData(end-299:end,1); %% latest 300 seconds time
             
-            event = importdata('../../DukeSmartHome_DataStreamDemo/EventDetection/eventData.csv');
+            event = importdata('..\EventDetection\eventData.csv');
             
-%             greenEventTime = event(find(event(:,3)~=0&event(:,4)==1),1);
-%             greenEventValue = zeros(length(greenEventTime),1);
-%             for i = 1:length(greenEventTime)
-%                 greenEventValue(i,1)=current_data(find(current_time==greenEventTime(i,1)));
-%             end
-%             
-%             redEventTime = event(find(event(:,3)~=0&event(:,4)==0),1);
-%             redEventValue = zeros(length(greenEventTime),1);
-%             for i = 1:length(redEventTime)
-%                 redEventValue(i,1)=current_data(find(current_time==redEventTime(i,1)));
-%             end
+            greenEventTime = event(find(event(:,3)~=0&event(:,4)==1),1);
+            greenIndex = find(event(:,3)~=0&event(:,4)==1);
+            greenEventValue = NaN;
+            redEventValue = NaN;
             
-            disagData = importdata('../../DukeSmartHome_DataStreamDemo/EventDetection/DisaggregatedPower.csv');
+            if current_time(1,1) < greenEventTime(1,1);
+                greenEventValue = zeros(length(greenEventTime),1);
+                for i = 1:length(greenEventTime)
+                    greenEventValue(i,1)=current_data(find(current_time==greenEventTime(i,1)));
+                end
+            end
+            redEventTime = event(find(event(:,3)~=0&event(:,4)==0),1);
+            redIndex = find(event(:,3)~=0&event(:,4)==0);
+            if current_time(1,1) < redEventTime(1,1);
+                redEventValue = zeros(length(greenEventTime),1);
+                for i = 1:length(redEventTime)
+                    redEventValue(i,1)=current_data(find(current_time==redEventTime(i,1)));
+                end
+            end
+            redEventValue
+            greenEventValue
             
-            if disagData(end, 2) == 0 %refridgerator
+            disagData = importdata('..\EventDetection\DisaggregatedPower.csv');
+            
+            if disagData(end, 2) <= 0 %Refrigerator
                 a = 'OFF'; rfcolor = 'r';
             else
                 a = 'ON'; rfcolor = 'g';
             end
             
-            if disagData(end, 3) == 0 %hotbox
+            if disagData(end, 3) <= 0 %hotbox
                 b = 'OFF'; hbcolor = 'r';
             else
                 b = 'ON'; hbcolor = 'g';
             end
             
-            if disagData(end, 4) == 0 %hvac1
+            if disagData(end, 4) <= 0 %hvac1
                 c = 'OFF'; hv1color = 'r';
             else
                 c = 'ON'; hv1color = 'g';
             end
             
-            if disagData(end, 5) == 0 %hvac2
+            if disagData(end, 5) <= 0 %hvac2
                 d = 'OFF'; hv2color = 'r';
             else
                 d = 'ON'; hv2color = 'g';
@@ -166,26 +185,30 @@ hold off
             
             appStatus={a,b,c,d};  % data input
             hrfs = uicontrol('Parent',hpanel,'Style','text','String',appStatus(1),...
-                'Position',[180,95,60,20],'FontSize',18,'FontName','Helvetica','BackgroundColor',rfcolor);
+                'Position',[210,95,60,25],'FontSize',16,'FontName','Helvetica','BackgroundColor',rfcolor);
             hhbs = uicontrol('Parent',hpanel,'Style','text','String',appStatus(2),...
-                'Position',[180,65,60,20],'FontSize',18,'FontName','Helvetica','BackgroundColor',hbcolor);
+                'Position',[210,65,60,25],'FontSize',16,'FontName','Helvetica','BackgroundColor',hbcolor);
             hhv1s = uicontrol('Parent',hpanel,'Style','text','String',appStatus(3),...
-                'Position',[180,35,60,20],'FontSize',18,'FontName','Helvetica','BackgroundColor',hv1color);
+                'Position',[210,35,60,25],'FontSize',16,'FontName','Helvetica','BackgroundColor',hv1color);
             hhv2s = uicontrol('Parent',hpanel,'Style','text','String',appStatus(4),...
-                'Position',[180,5,60,20],'FontSize',18,'FontName','Helvetica','BackgroundColor',hv2color);
+                'Position',[210,5,60,25],'FontSize',16,'FontName','Helvetica','BackgroundColor',hv2color);
 
             
             %% Live plot
             axes(ha);
             set(plot_Aggreg, 'YData', current_data,'Color','b');
             set(gca,'FontSize',12,'XTick',[0,100,200,300],...
-                'XTickLabel',{datestr(current_time(1,1)/86400+719529,13),...
-                datestr(current_time(100,1)/86400+719529,13),...
+                'XTickLabel',{datestr(current_time(300,1)/86400+719529,13),...
                 datestr(current_time(200,1)/86400+719529,13),...
-                datestr(current_time(300,1)/86400+719529,13)});
-%           set(halegend,'show')
-            drawnow
+                datestr(current_time(100,1)/86400+719529,13),...
+                datestr(current_time(1,1)/86400+719529,13)});
             
+            %           set(halegend,'show')
+            drawnow
+            hold on
+            plot_greenEvent = plot(greenIndex,greenEventValue,'go');
+            plot_redEvent = plot(redIndex,redEventValue,'ro');
+            hold off
 %             hold on
 %             plot_greenEvent = plot(greenEventTime,greenEventValue,'go')
 %             plot_redEvent = plot(redEventTime,redEventValue,'ro')
@@ -217,21 +240,28 @@ hold off
             
             
             %% Prediction Plot
+            anomalyMatrix = importdata('..\ARIMAANN\anomalyMatrix.csv');
             axes(hb);
+            hold on
+%             set(hb,'XTickLabel',[0,10])
+            set(hb,'FontSize',12,'XTick',[anomalyMatrix(1,1),anomalyMatrix(end,1)],...
+                'XTickLabel',{datestr(anomalyMatrix(1,1)/1440+719529,13),...
+                datestr(anomalyMatrix(end,1)/1440+719529,13)});
             % Set current data to the selected data set.
             switch option
-                case 'Refridgerator'
+                case 'Refrigerator'
                     current_actual = anomalyMatrix(:, 2);
                     current_predict = anomalyMatrix(:, 3);
                 case 'Hot Box'
-                    current_actual = anomalyMatrix(:, 4);
-                    current_predict = anomalyMatrix(:, 5);
+                    current_actual = anomalyMatrix(:, 5);
+                    current_predict = anomalyMatrix(:, 6);
                 case 'HVAC System'
-                    current_actual = anomalyMatrix(:, 6);
-                    current_predict = anomalyMatrix(:, 7);
+                    current_actual = anomalyMatrix(:, 8);
+                    current_predict = anomalyMatrix(:, 9);
             end
             set(plot_predict,'YData',current_predict,'Color','r');
             set(plot_actual,'YData',current_actual,'Color','k');
+            hold off
 %             set(gca,'FontSize',12,'XTick',[0,100,200,300],...
 %                 'XTickLabel',{datestr(anomalyMatrix(1,1)/86400+719529,13),...
 %                 datestr(anomalyMatrix(end,1)/86400+719529,13)});
