@@ -24,5 +24,5 @@ function [refAnomalies, hotBoxAnomalies, hvacAnomalies] = anomalyDetection
         refAnomalies(:,4) hotBoxAnomalies(:,2) hotBoxAnomalies(:,3) hotBoxAnomalies(:,4) ...
         hvacAnomalies(:,2) hvacAnomalies(:,3) hvacAnomalies(:,4)];
     
-    save('anomalyMatrix');
+    dlmwrite('anomalyMatrix.csv',anomalyMatrix,'precision',11);
 end
