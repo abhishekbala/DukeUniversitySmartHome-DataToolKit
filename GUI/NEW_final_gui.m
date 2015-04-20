@@ -73,12 +73,12 @@ a = 'OFF'; b ='OFF'; c ='OFF'; d = 'OFF';
     end
 
 %% initial plot
-shData = importdata('../dataCollectors/shData.csv');
+shData = importdata('..\dataCollectors\shData.csv');
 aggregData = shData(:,2)+shData(:,3)-shData(:,4)-shData(:,5);
 current_data = aggregData(end-299:end,1);  %% latest 300 seconds data
 current_time = shData(end-299:end,1); %% latest 300 seconds time
 
-event = importdata('../EventDetection/eventData.csv');
+event = importdata('..\EventDetection\eventData.csv');
 
 if find(event(:,1)==current_time(1))
     greenEvent = NaN(300,1);
@@ -106,7 +106,7 @@ ylabel('Power (W)','FontSize',14);
 hold off
 
 
-anomalyMatrix = importdata('../ARIMAANN/anomalyMatrix.csv');
+anomalyMatrix = importdata('..\ARIMAANN\anomalyMatrix.csv');
 current_actual = anomalyMatrix(:, 2);
 current_predict = anomalyMatrix(:, 3);
 axes(hb);
@@ -129,12 +129,12 @@ hold off
         
         while(get(hObject, 'Value'))         
             %% Input Data
-            shData = importdata('../dataCollectors/shData.csv');
+            shData = importdata('..\dataCollectors\shData.csv');
             aggregData = shData(:,2)+shData(:,3)-shData(:,4)-shData(:,5);
             current_data = aggregData(end-299:end,1);  %% latest 300 seconds data
             current_time = shData(end-299:end,1); %% latest 300 seconds time
             
-            event = importdata('../EventDetection/eventData.csv');
+            event = importdata('..\EventDetection\eventData.csv');
             
             greenEventTime = event(find(event(:,3)~=0&event(:,4)==1),1);
             greenIndex = find(event(:,3)~=0&event(:,4)==1);
@@ -157,7 +157,7 @@ hold off
             end
             
             
-            disagData = importdata('../EventDetection/DisaggregatedPower.csv');
+            disagData = importdata('..\EventDetection\DisaggregatedPower.csv');
             
             if disagData(end, 2) <= 0 %Refrigerator
                 a = 'OFF'; rfcolor = 'r';
@@ -212,7 +212,7 @@ hold off
 
             
             %% Prediction Plot
-            anomalyMatrix = importdata('../ARIMAANN/anomalyMatrix.csv');
+            anomalyMatrix = importdata('..\ARIMAANN\anomalyMatrix.csv');
             axes(hb);
             hold on
             set(hb,'Visible','on','FontSize',12,'XTick',[anomalyMatrix(1,1),anomalyMatrix(end,1)],...
