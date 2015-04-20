@@ -8,7 +8,7 @@ import os
 import time
 import csv
 import pymysql.cursors
-unixEndTime = 1429498459
+unixEndTime = 1429403762
 unixStartTime = unixEndTime - (1)*46800
 
 # print command just for visualising script run.
@@ -35,7 +35,7 @@ ORDER BY smarthome.timestamp ASC")
 # Store the 1 second data locally.
 shData = [row for row in cursor]
 # Store in csv (append).
-with open("12Hours.csv",'wb') as csvOut:
+with open("13Hours.csv",'wb') as csvOut:
 	csvwriter = csv.writer(csvOut,delimiter=',',dialect='excel')
 	csvwriter.writerows(shData)
 

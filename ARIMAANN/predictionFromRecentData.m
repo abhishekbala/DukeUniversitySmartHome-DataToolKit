@@ -48,7 +48,8 @@ for i = 1:10;
     end  
 end
 anomalyCol = anomalyVec';
-predictCol = predict'
+predictCol = predict';
+mostRec = mostRec';
 result = [timePredict mostRec predictCol anomalyCol]
 predLength = length(predict);
 othLength = length(mostRec);

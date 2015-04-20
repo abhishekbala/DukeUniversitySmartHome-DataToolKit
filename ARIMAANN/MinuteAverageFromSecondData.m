@@ -1,4 +1,4 @@
-function MinuteAverageFromSecondData(secondData)
+function minutes = MinuteAverageFromSecondData(secondData)
 %   Input: Read from with second event data for one appliance
 %   Output: - Write to CSV with minute averaged data for each appliance
 
