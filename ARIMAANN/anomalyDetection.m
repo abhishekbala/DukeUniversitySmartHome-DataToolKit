@@ -13,7 +13,7 @@ function [refAnomalies, hotBoxAnomalies, hvacAnomalies] = anomalyDetection
     
     netRef = load('netRef');
     netHotBox = load('netHotbox');
-    netHVAC = load('netHVAC');
+    netHVAC = load('netHVACsum');
     
     refAnomalies = InputDatav2(netRef, preProcessData(disaggregatedDataRefridge));
     hotBoxAnomalies = InputDatav2(netHotBox, preProcessData(disaggregatedDataHotBox));
