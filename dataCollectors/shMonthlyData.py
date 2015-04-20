@@ -8,8 +8,8 @@ import os
 import time
 import csv
 import pymysql.cursors
-unixEndTime = 1429494983
-unixStartTime = unixEndTime - (1)*43200
+unixEndTime = 1429498459
+unixStartTime = unixEndTime - (1)*46800
 
 # print command just for visualising script run.
 #print "New Data to be loaded"
