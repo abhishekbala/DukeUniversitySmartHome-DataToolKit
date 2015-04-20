@@ -9,7 +9,6 @@ csvwrite('DisaggregatedPower.csv', []);
 firstTimeData = importdata('eventData.csv');
 [numRows, ~] = size(firstTimeData);
 functionPointers = [0, 0, 0, 0];
-memoryOfPreviousPowerValues = [0, 0, 0, 0, 0];
 
 for i = 1:numRows
     % Assume that the functionPointers are [0, 0, 0, 0] ==> all appliances
@@ -27,20 +26,11 @@ for i = 1:numRows
     
     currentTime = firstTimeData(i,1);
     disagMatrix = firstTimeData(i,:);
-    applianceNumber = disagMatrix(2);
     
-    if(applianceNumber == 0)
-        memoryOfPreviousPowerValues(1) = currentTime;
-        dlmwrite('DisaggregatedPower.csv', memoryOfPreviousPowerValues, '-append', 'newline', 'pc');
-    else
-        [appliancePowerOutputs, functionPointers] = DisaggregationOutput(currentTime, disagMatrix, functionPointers);
-        
-        memoryOfPreviousPowerValues(applianceNumber+ 1) = appliancePowerOutputs(applianceNumber+1);
-        memoryOfPreviousPowerValues(1) = appliancePowerOutputs(1);
-        
-        %% CSV Write:
-        dlmwrite('DisaggregatedPower.csv', memoryOfPreviousPowerValues, '-append', 'newline', 'pc');
-    end
+    [appliancePowerOutputs, functionPointers] = DisaggregationOutput(currentTime, disagMatrix, functionPointers);
+    
+    %% CSV Write:
+    dlmwrite('DisaggregatedPower.csv', appliancePowerOutputs, '-append', 'newline', 'pc');
 end
 
 %% Continuous Stream:
@@ -51,9 +41,11 @@ end
 %     functionPointers(appliancePowers ~= 0) = 1;
 %     pause(1)
 
-% memoryOfPreviousPowerValues = importData('DisaggregatedPower.csv');
-% [rowsDisaggregatedPower, ~] = size(memoryOfPreviousPowerValues);
-% memoryOfPreviousPowerValues = memoryOfPreviousPowerValues(numRows, :);
+
+
+memoryOfPreviousPowerValues = importData('DisaggregatedPower.csv');
+[rowsDisaggregatedPower, colsDisaggregatedPower] = size(memory)
+memoryOfPreviousPowerValues = memoryOfPreviousPowerValues(length(memoryOfPreviousPowerValues), :)
 
 while(1)
     liveData = importdata('eventData.csv');
@@ -62,19 +54,13 @@ while(1)
         numRows = numRows + 1;
         currentTime = liveData(numRows,1);
         disagMatrix = liveData(numRows,:);
-        applianceNumber = disagMatrix(2);
         
-        if(applianceNumber == 0)
-            memoryOfPreviousPowerValues(1) = currentTime;
-            dlmwrite('DisaggregatedPower.csv', memoryOfPreviousPowerValues, '-append', 'newline', 'pc');
-        else
-            [appliancePowerOutputs, functionPointers] = DisaggregationOutput(currentTime, disagMatrix, functionPointers);
-            
-            memoryOfPreviousPowerValues(applianceNumber+ 1) = appliancePowerOutputs(applianceNumber+1);
-            memoryOfPreviousPowerValues(1) = appliancePowerOutputs(1);
-            
-            dlmwrite('DisaggregatedPower.csv', memoryOfPreviousPowerValues, '-append', 'newline', 'pc');
+        if(disagMatrix(2) == 0)
+            dlmwrite('DisaggregatedPower.csv', memoryOfPrevious, '-append', 'newline', 'pc');
         end
+        [appliancePowerOutputs, functionPointers] = DisaggregationOutput(currentTime, disagMatrix, functionPointers);
+        memoryOfPreviousPowerValues = appliancePowerOutputs;
+        dlmwrite('DisaggregatedPower.csv', appliancePowerOutputs, '-append', 'newline', 'pc');
     end
     %% CSV Write:
     pause(1)

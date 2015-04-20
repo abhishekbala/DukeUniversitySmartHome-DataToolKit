@@ -62,20 +62,19 @@ function [myOutput, pointers] = DisaggregationOutput(timeVector, DisagMatrix, fu
     
     ApplianceVector = DisagMatrix; %Find the last line of the matrix
     %ApplianceVector = ApplianceVector';
-    deltaPower = ApplianceVector(3);
     
     pointers = zeros(1, numberAppliances);
     myOutput = zeros(1, numberAppliances + 1);
     myOutput(1) = timeVector(numel(timeVector)); % Most recent time --> a single time point
     
     if(ApplianceVector(2) == 1)
-        [myOutput(2), pointers(1)] = TimeSeriesCreate2(ApplianceVector, deltaPower, functionPointers(1));
+        [myOutput(2), pointers(1)] = TimeSeriesCreate2(ApplianceVector, , functionPointers(1));
     elseif(ApplianceVector(2) == 2)
-        [myOutput(3), pointers(2)] = TimeSeriesCreate2(ApplianceVector, deltaPower, functionPointers(2));
+        [myOutput(3), pointers(2)] = TimeSeriesCreate2(ApplianceVector, 500, functionPointers(2));
     elseif(ApplianceVector(2) == 3)
-        [myOutput(4), pointers(3)] = TimeSeriesCreate2(ApplianceVector, deltaPower, functionPointers(3));
+        [myOutput(4), pointers(3)] = TimeSeriesCreate2(ApplianceVector, 500, functionPointers(3));
     elseif(ApplianceVector(2) == 4)
-        [myOutput(5), pointers(4)] = TimeSeriesCreate2(ApplianceVector, deltaPower, functionPointers(4));
+        [myOutput(5), pointers(4)] = TimeSeriesCreate2(ApplianceVector, 500, functionPointers(4));
     end
     
     
@@ -113,7 +112,7 @@ elseif(pointerStatus == 1 && onOffStatus == 1) % PREVIOUS STATUS OF APPLIANCE IS
     ApplianceTimePoint = onOffStatus * avgOnPower; % Change the appliance power output to ON
     pointer = 1; % Pointer shows that appliance is in on state.
 elseif(pointerStatus == 1 && onOffStatus == 0) % PREVIOUS STATUS OF APPLIANCE IS ON AND CURRENT STATUS SAYS APPLIANCE STAYS IN ORIGINAL STATE
-    ApplianceTimePoint = avgOnPower; % Keep the appliance power output to ON.
+    ApplianceTimePoint = 0; % Keep the appliance power output to ON.
     pointer = 1;
 elseif(pointerStatus == 1 && onOffStatus == -1) % PREVIOUS STATUS OF APPLIANCE IS ON AND CURRENT STATUS SAYS APPLIANCE TURNS OFF
     ApplianceTimePoint = 0; % Change the appliance power output to OFF
