@@ -153,8 +153,8 @@ hold off
                     redEventValue(i,1)=current_data(find(current_time==redEventTime(i,1)));
                 end
             end
-            redEventValue
-            greenEventValue
+%             redEventValue
+%             greenEventValue
             
             disagData = importdata('..\EventDetection\DisaggregatedPower.csv');
             
