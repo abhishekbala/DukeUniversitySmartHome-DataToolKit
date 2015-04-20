@@ -1,4 +1,4 @@
-function net = Train();
+function net = Train()
 
 refrigeratorPre = importdata('shHistoricalTestDataMarch29.csv');
 refrigerator = [refrigeratorPre(:,1) refrigeratorPre(:,14)]; 
