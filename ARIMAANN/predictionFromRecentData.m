@@ -34,13 +34,13 @@ end
 
 old = [old oldnewlast];
 
-predict = old(1,end-9:end)
-plot(1:length(alldata),alldata, (length(rec)+1):length(alldata),predict)
-xlabel('Time (minutes)')
-ylabel('Refrigerator Power  (Watts)')
-title('Graph of Actual vs. Predicted Power Values')
-axis([length(alldata)-100 length(alldata) -200 200])
-legend('Actual Real-time Disaggregated Data', 'Predicted Disagregatted Data',0)%, 'Anomaly Benchmark', 'Anomaly Benchmark')
+predict = old(1,end-9:end);
+% plot(1:length(alldata),alldata, (length(rec)+1):length(alldata),predict)
+% xlabel('Time (minutes)')
+% ylabel('Refrigerator Power  (Watts)')
+% title('Graph of Actual vs. Predicted Power Values')
+% axis([length(alldata)-100 length(alldata) -200 200])
+% legend('Actual Real-time Disaggregated Data', 'Predicted Disagregatted Data',0)%, 'Anomaly Benchmark', 'Anomaly Benchmark')
 anomalyVec = zeros(1,10)
 for i = 1:10;
     if (mostRec(i)-predict(i))>std(rec)
@@ -51,16 +51,16 @@ anomalyCol = anomalyVec';
 predictCol = predict';
 mostRec = mostRec';
 result = [timePredict mostRec predictCol anomalyCol]
-predLength = length(predict);
-othLength = length(mostRec);
-
-rms = sqrt(sum((mostRec(:)-predict(:)).^2))/numel(mostRec)
-sub = mostRec(:)-predict(:);
-view = mostRec(:);
-div = sub./view;
-nums = numel(mostRec(:));
-first = sum(div);
-percenterror = first/nums
+% predLength = length(predict);
+% othLength = length(mostRec);
+% 
+% rms = sqrt(sum((mostRec(:)-predict(:)).^2))/numel(mostRec)
+% sub = mostRec(:)-predict(:);
+% view = mostRec(:);
+% div = sub./view;
+% nums = numel(mostRec(:));
+% first = sum(div);
+% percenterror = first/nums;
 %end
 
 end
