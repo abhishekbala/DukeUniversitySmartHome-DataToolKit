@@ -1,0 +1,3 @@
+function anomalyDetection
+    csvread(
+end
