@@ -1,4 +1,4 @@
-function result = InputDatav2(net, recPre)
+function result = predictionFromRecentData(net, recPre)
 %recPre is the .mat file of input data with two columns in it -
 %preprocessed
 timePredict = recPre(end-9:end, 1);
@@ -49,7 +49,7 @@ for i = 1:10;
 end
 anomalyCol = anomalyVec';
 predictCol = predict'
-result = [timePredict predictCol anomalyCol]
+result = [timePredict mostRec predictCol anomalyCol]
 predLength = length(predict);
 othLength = length(mostRec);
 
