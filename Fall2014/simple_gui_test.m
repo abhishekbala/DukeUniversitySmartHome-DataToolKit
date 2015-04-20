@@ -2,7 +2,7 @@ function simple_gui_test
 %% Initialize Data:
 clear; clc;
 load('phaseData.mat', 'phaseData' );
-load('fridgedata.mat', 'fridgeData');
+% load('fridgedata.mat', 'fridgeData');
 load('timeString.mat', 'timeString');
 load('timevec.mat', 'timevec')
 load('solarData.mat', 'solarData');
@@ -22,7 +22,7 @@ counter = 0;
 solarData = -1*(solarData(:,1) + solarData(:,2));
 phaseData(:,1) = phaseData(:,1) + solarData;
 totalData = phaseData(:,1) + phaseData(:,2);
-sampleDataSet = [totalData phaseData solarData fridgeData];
+sampleDataSet = [totalData phaseData solarData];
 sampleTime = timevec;
 %% GUI Code
 % Select a data set from the pop-up menu, then
