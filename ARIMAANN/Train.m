@@ -1,14 +1,14 @@
-function net = Train();
+function net = Train()
 
-refrigeratorPre = importdata('shHistoricalTestDataMarch29.csv');
-refrigerator = [refrigeratorPre(:,1) refrigeratorPre(:,14)]; 
+smartHomeData = importdata('shHistoricalTestDataMarch29.csv');
+hvacColumn = smartHomeData(:,6) + smartHomeData(:,7) + ...
+    smartHomeData(:,8) + smartHomeData(:,9);
+hvac = [smartHomeData(:,1) hvacColumn];
 %addCols = [refrigeratorPre(:,1) refrigeratorPre(:,9)]; %forhvac
 %refrigerator = [refrigeratorBefore; addCols]; %forhvac
-HistMatPre = fixMissingValues(refrigerator);
-MinuteAverageFromSecondData(HistMatPre);
-Hist = importdata('data.csv');
+HistMatPre = fixMissingValues(hvac);
+Hist = MinuteAverageFromSecondData(HistMatPre);
 trainingData = Hist(:,2)';
-
 
 %xblock1 = 1:((2345-616)/60);
 %xblock2 = 1:((3869-2345)/60);
@@ -34,7 +34,7 @@ feedbackDelaysValues2 = zeros(1,10);
 lag=[1];
 for k = 1:10
     feedbackDelaysValues2(k) = max(abs(feedbackDelaysValues));
-    if((feedbackDelays(find(abs(feedbackDelaysValues)==feedbackDelaysValues2(k))))<4000)
+    if((feedbackDelays(find(abs(feedbackDelaysValues)==feedbackDelaysValues2(k))))<720)
         lag(k) = feedbackDelays(find(abs(feedbackDelaysValues)==feedbackDelaysValues2(k)));
     end
     removeIndex = find(abs(feedbackDelaysValues)==feedbackDelaysValues2(k))
@@ -50,5 +50,5 @@ net = narnet(lags, hiddenLayerSize);
 
 [inputs, inputStates, layerStates, targets] = preparets(net, {}, {}, oldSeries);
 [net, tr] = train(net, inputs, targets, inputStates, layerStates);
-save 'netHVAC2.mat' net
+save 'netHVACsum.mat' net
 end
