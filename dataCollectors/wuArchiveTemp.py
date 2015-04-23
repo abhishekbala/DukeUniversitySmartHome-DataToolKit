@@ -10,6 +10,8 @@ import time
 import urllib
 import sys
 
+## arguments to be provided when running the script from the prompt <python wuArchiveTemp.py dd mm yyyy numDays>
+
 dd = str(sys.argv[1])
 mm = str(sys.argv[2])
 yyyy = str(sys.argv[3])
@@ -18,7 +20,6 @@ numDays = int(sys.argv[4])
 #wuArchive(dd, mm, yyyy, numDays):
 ## dd/mm/yyyy format
 
-#dateStr = (time.strftime("%Y/%m/%d"))
 dateStr = str(yyyy+'/'+mm+'/'+dd)
 yearInt = int(dateStr[0:4])
 monthInt = int(dateStr[5:7])
@@ -26,18 +27,13 @@ monthInt = int(dateStr[5:7])
 # if the month or day is less than ten, the zero before it gets cut off
 dayInt = int(dateStr[8:10])
 
-
 # open a file for writing.
 csv_out = open("wuTempArchive.csv",'wb')
 
 # create the csv writer object.
 mywriter = csv.writer(csv_out)
 
-
-
-###############
-## numDays = 5
-
+###---------------------------------------------------------------------------------------------------------
 while numDays !=0:
 	url = 'http://www.wunderground.com/history/airport/KRDU/' +dateStr+ '/DailyHistory.html?format=1'
 	print url
@@ -81,8 +77,4 @@ while numDays !=0:
 
 	dateStr = str(yearInt)+'/'+monthStr+'/'+dayStr
 
-
-
 csv_out.close()
-
-#return
