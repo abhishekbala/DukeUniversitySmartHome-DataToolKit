@@ -1,66 +1,61 @@
 function result = predictionFromRecentData(net, recPre)
-%recPre is the .mat file of input data with two columns in it -
-%preprocessed
+
+%Creates vector of timestamps for the last ten mins of disagg. data
 timePredict = recPre(end-9:end, 1);
-rec = recPre(1:end-10,2)';
+
+
+%Creates vector of all disagg. data power values (for graphing if desired)
 alldata = recPre(1:end,2)';
+
+%Creates vector of all disagg. data power values minus the last ten mins
+rec = recPre(1:end-10,2)';
+
+%Creates vector of the last ten mins of power values of disagg. data 
 mostRec = recPre(end-9:end,2)';
 
-old = rec;
-oldnewlast = [];
+inputData = rec;
+inputDataNewest = [];
+
+%Recursively predict the next 10 minutes of data
 for i = 1:10;
-old = [old oldnewlast];
-
-%if(i==1)
-y(1:size(old,2)) = old(1:end);
-%else
-    %y(1:size(old,2)-1) = old(2:end);
-%end
     
+%Adds predicted data point to old data    
+inputData = [inputData inputDataNewest];
 
-Ypred = num2cell(y);
+y(1:size(inputData,2)) = inputData(1:end);
+preFormatted = num2cell(y);
 
-gotHere = 1;
 nets = removedelay(net);
-[a1, b1, c1, d1] = preparets(nets, {}, {}, Ypred);
+[a1, b1, c1, d1] = preparets(nets, {}, {}, preFormatted);
 
-gotHere = 2;
-outputer = nets(a1,b1,c1);
+formattedInputData = nets(a1,b1,c1);
 
-gotHere = 3;
-oldnew = cell2mat(outputer);
-oldnewlast = oldnew(1,end);
+cellFormattedInputData = cell2mat(formattedInputData);
+inputDataNewest = cellFormattedInputData(1,end);
 end
 
-old = [old oldnewlast];
+inputData = [inputData inputDataNewest];
 
-predict = old(1,end-9:end);
-% plot(1:length(alldata),alldata, (length(rec)+1):length(alldata),predict)
-% xlabel('Time (minutes)')
-% ylabel('Refrigerator Power  (Watts)')
-% title('Graph of Actual vs. Predicted Power Values')
-% axis([length(alldata)-100 length(alldata) -200 200])
-% legend('Actual Real-time Disaggregated Data', 'Predicted Disagregatted Data',0)%, 'Anomaly Benchmark', 'Anomaly Benchmark')
-anomalyVec = zeros(1,10)
+%Extracts most recent 10 minutes of data from old data + predictions
+%These are the predicted data values
+predict = inputData(1,end-9:end);
+
+anomalyVec = zeros(1,10);
+
+%Detects anomalies if the most recent 10 minutes of disagg. data
+%Aren't within an acceptable range of the predicted data
 for i = 1:10;
     if (mostRec(i)-predict(i))>std(rec)
         anomalyVec(i) = 1;
     end  
 end
+
+%Creates matrix of timestamps, predicted data values, and whether or not
+%There is an anomaly at a given point
+
 anomalyCol = anomalyVec';
 predictCol = predict';
 mostRec = mostRec';
-result = [timePredict mostRec predictCol anomalyCol]
-% predLength = length(predict);
-% othLength = length(mostRec);
-% 
-% rms = sqrt(sum((mostRec(:)-predict(:)).^2))/numel(mostRec)
-% sub = mostRec(:)-predict(:);
-% view = mostRec(:);
-% div = sub./view;
-% nums = numel(mostRec(:));
-% first = sum(div);
-% percenterror = first/nums;
-%end
 
+result = [timePredict mostRec predictCol anomalyCol]
 end
