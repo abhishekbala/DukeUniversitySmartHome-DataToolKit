@@ -1,4 +1,4 @@
-function final_gui
+function NEW_final_gui
 %% Initialize Data:
 clear; clc;
 
@@ -14,8 +14,14 @@ f = figure('Visible','off','Position',[270,1000,1200,700]);
 hstart = uicontrol('Style','togglebutton','String','Start',...
     'Position',[200,330,200,50],...
     'Callback',{@start_Callback},'FontSize',20);
-ha = axes('Units','Pixels','Position',[150,450,600,200],'Visible','off');
-hb = axes('Units','Pixels','Position',[150, 50, 600, 200],'Visible','off');
+htitle1 = uicontrol('Style','text','String','Smart Home Aggregate Power Data','FontWeight','Bold',...
+    'Position',[250,650,400,30],'FontSize',20,'FontName','Helvetica','BackgroundColor','w');
+
+htitle2 = uicontrol('Style','text','String','Predicted vs Actual Power Data of','FontWeight','Bold',...
+    'Position',[185,250,400,25],'FontSize',20,'FontName','Helvetica','BackgroundColor','w');
+
+ha = axes('Units','Pixels','Position',[150,450,600,200],'Visible','off','Box','on');
+hb = axes('Units','Pixels','Position',[150, 50, 600, 200],'Visible','off','Box','on');
 hpanel = uipanel('Units','Pixels','Title','Appliance Status','FontSize',20,'FontWeight','Bold',...
     'Position',[150,290,300,140],'BackgroundColor','w','FontName','Helvetica');
 hrf = uicontrol('Parent',hpanel,'Style','text','String','Refrigerator',...
@@ -32,14 +38,14 @@ hpopup = uicontrol('Style','popupmenu',...
     'Callback',{@popup_menu_Callback},...
     'FontSize',20);
 hanomaly = uicontrol('Style','text','String','Anomaly Log','FontSize',20,'FontWeight','Bold',...
-    'Position',[800,630,300,50],'BackgroundColor','w','FontName','Helvetica');
-hlist = uicontrol('Style','List','Position',[800,50,300,600]);
+    'Position',[800,600,300,50],'BackgroundColor','w','FontName','Helvetica');
+hlist = uicontrol('Style','List','Position',[800,50,300,570]);
 
 
 
 % Initialize the GUI.
 % Change units to normalized so components resize automatically.
-set([f,hstart,ha,hb,hpanel,hpopup,hanomaly,hlist],...
+set([f,hstart,ha,hb,hpanel,hpopup,hanomaly,hlist,htitle1,htitle2],...
     'Units','normalized');
 % Assign the GUI a name to appear in the window title.
 set(f,'Name','Test GUI')
@@ -74,46 +80,42 @@ current_time = shData(end-299:end,1); %% latest 300 seconds time
 
 event = importdata('..\EventDetection\eventData.csv');
 
-greenEventTime = event(find(event(:,3)~=0&event(:,4)==1),1);
-greenIndex = find(event(:,3)~=0&event(:,4)==1);
-greenEventValue = NaN;
-redEventValue = NaN;
-
-if current_time(1,1) < greenEventTime(1,1);
-    greenEventValue = zeros(length(greenEventTime),1);
-    for i = 1:length(greenEventTime)
-        greenEventValue(i,1)=current_data(find(current_time==greenEventTime(i,1)));
-    end
-end
-redEventTime = event(find(event(:,3)~=0&event(:,4)==0),1);
-redIndex = find(event(:,3)~=0&event(:,4)==0);
-if current_time(1,1) < redEventTime(1,1);
-    redEventValue = zeros(length(greenEventTime),1);
-    for i = 1:length(redEventTime)
-        redEventValue(i,1)=current_data(find(current_time==redEventTime(i,1)));
+if find(event(:,1)==current_time(1))
+    greenEvent = NaN(300,1);
+    redEvent = NaN(300,1);
+    if find(event(:,1)==current_time(end))
+    current_event=event(find(event(:,1)==current_time(1)):(find(event(:,1)==current_time(end))),:);
+    greenIndex = find(current_event(:,3)~=0&current_event(:,4)==1);
+    greenEvent(greenIndex) = current_data(greenIndex);
+    redIndex = find(current_event(:,3)~=0&current_event(:,4)==0);
+    redEvent(redIndex) = current_data(redIndex);
     end
 end
 
 axes(ha);
+hold on
 plot_Aggreg = plot(linspace(numel(current_data),1,numel(current_data)), current_data,'w');
 set(gca, 'Xdir', 'reverse');
-hold on
-plot_greenEvent = plot(greenIndex,greenEventValue,'go');
-plot_redEvent = plot(redIndex,redEventValue,'ro');
-hold off
-% halegend = legend([plot_greenEvent plot_redEvent],'ON Event','OFF Event');
-title('Smart Home Aggregate Power Data','FontSize',20,'FontWeight','bold','FontName','Helvetica');
+plot_greenEvent = plot(linspace(numel(current_data),1,numel(current_data)),greenEvent,...
+    'go','LineWidth',2,'MarkerSize',8);
+plot_redEvent = plot(linspace(numel(current_data),1,numel(current_data)),redEvent,...
+    'ro','LineWidth',2,'MarkerSize',8);
+lg1=legend([plot_Aggreg,plot_greenEvent,plot_redEvent],'Aggregate Power');%,'ON Event','OFF Event');
+set(lg1,'Location','NorthOutside','Orientation','horizontal')
 ylabel('Power (W)','FontSize',14);
+hold off
 
 
 anomalyMatrix = importdata('..\ARIMAANN\anomalyMatrix.csv');
 current_actual = anomalyMatrix(:, 2);
 current_predict = anomalyMatrix(:, 3);
 axes(hb);
-plot_predict=plot(anomalyMatrix(:,1),current_predict,'w-');
 hold on
+plot_predict=plot(anomalyMatrix(:,1),current_predict,'w-');
 plot_actual=plot(anomalyMatrix(:,1), current_actual,'w-');
-title('Predicted vs Actual Power Data of                          ','FontSize',20,'FontWeight','bold','FontName','Helvetica');
+lg2=legend([plot_predict,plot_actual],'Predicted','Actual');
+set(lg2,'Location','NorthOutside','Orientation','horizontal')
+ylabel('Power (W)','FontSize',14);
 hold off
 
 
@@ -153,8 +155,7 @@ hold off
                     redEventValue(i,1)=current_data(find(current_time==redEventTime(i,1)));
                 end
             end
-%             redEventValue
-%             greenEventValue
+            
             
             disagData = importdata('..\EventDetection\DisaggregatedPower.csv');
             
@@ -196,57 +197,27 @@ hold off
             
             %% Live plot
             axes(ha);
-            set(plot_Aggreg, 'YData', current_data,'Color','b');
-            set(gca,'FontSize',12,'XTick',[0,100,200,300],...
-                'XTickLabel',{datestr(current_time(300,1)/86400+719529,13),...
-                datestr(current_time(200,1)/86400+719529,13),...
-                datestr(current_time(100,1)/86400+719529,13),...
-                datestr(current_time(1,1)/86400+719529,13)});
-            
-            %           set(halegend,'show')
-            drawnow
+            set(ha,'Visible','on','xlim',[1 300])
             hold on
-            plot_greenEvent = plot(greenIndex,greenEventValue,'go');
-            plot_redEvent = plot(redIndex,redEventValue,'ro');
+            set(plot_Aggreg, 'YData', current_data,'Color','b');
+            set(plot_greenEvent, 'YData', greenEvent,'Color','g','Marker','o','LineWidth',2,'MarkerSize',8);
+            set(plot_redEvent, 'YData', redEvent,'Color','r','Marker','o','LineWidth',2,'MarkerSize',8);
+            set(ha,'FontSize',12,'XTick',[0,100,200,300],...
+                'XTickLabel',{datestr(current_time(300,1)/86400+719529 - 4/24,13),...
+                datestr(current_time(200,1)/86400+719529 - 4/24,13),...
+                datestr(current_time(100,1)/86400+719529 - 4/24,13),...
+                datestr(current_time(1,1)/86400+719529 - 4/24,13)});
+            drawnow
             hold off
-%             hold on
-%             plot_greenEvent = plot(greenEventTime,greenEventValue,'go')
-%             plot_redEvent = plot(redEventTime,redEventValue,'ro')
-%             hold off
 
-
-%             xlabel(datestr(current(200,1)/86400+719529,1),'FontSize',14);
-            %         set(gca,'FontSize',12,'XTick',[0,200],...
-            %             'XTickLabel',{datestr(latest_time(1,1)/86400+719529,13),...
-            %             datestr(latest_time(200,1)/86400+719529,13)});
-            
-            %         while(1)
-            %             axes(ha);
-            %             axis([0, 200, 0 , 8000]);
-            % %             xlabel(datestr(latest_time(200,1)/86400+719529,1),'FontSize',14);
-            %             ylabel('Power (W)','FontSize',14);
-            %             set(gca,'FontSize',12,'XTick',[0,200],...
-            %                 'XTickLabel',{datestr(latest_time(1,1)/86400+719529,13),...
-            %                 datestr(latest_time(200,1)/86400+719529,13)});
-            %             counter = counter + 1;
-            %             if counter == 20
-            %                 pause(0.01);
-            %             else
-            %                 pause(0.5);
-            %             end
-            %             drawnow;
-            %         end
-            
-            
             
             %% Prediction Plot
             anomalyMatrix = importdata('..\ARIMAANN\anomalyMatrix.csv');
             axes(hb);
             hold on
-%             set(hb,'XTickLabel',[0,10])
-            set(hb,'FontSize',12,'XTick',[anomalyMatrix(1,1),anomalyMatrix(end,1)],...
-                'XTickLabel',{datestr(anomalyMatrix(1,1)/1440+719529,13),...
-                datestr(anomalyMatrix(end,1)/1440+719529,13)});
+            set(hb,'Visible','on','FontSize',12,'XTick',[anomalyMatrix(1,1),anomalyMatrix(end,1)],...
+                'XTickLabel',{datestr(anomalyMatrix(1,1)/1440+719529 - 4/24,15),...
+                datestr(anomalyMatrix(end,1)/1440+719529 - 4/24,15)});
             % Set current data to the selected data set.
             switch option
                 case 'Refrigerator'
@@ -261,12 +232,11 @@ hold off
             end
             set(plot_predict,'YData',current_predict,'Color','r');
             set(plot_actual,'YData',current_actual,'Color','k');
+            drawnow
             hold off
-%             set(gca,'FontSize',12,'XTick',[0,100,200,300],...
-%                 'XTickLabel',{datestr(anomalyMatrix(1,1)/86400+719529,13),...
-%                 datestr(anomalyMatrix(end,1)/86400+719529,13)});
-% legend(hb,'show');
-%             drawnow
+            
+%% Anomaly Log
+            
         end
     end
 end
