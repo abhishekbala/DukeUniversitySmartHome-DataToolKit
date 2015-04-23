@@ -1,6 +1,7 @@
 function [ ONdcsID, OFFdcsID, TOTdcsID, MaxDistanceON, MaxDistanceOFF, MeanDistanceON, MeanDistanceOFF ] = FullDisaggregation( data, onEvents, offEvents, allEvents )
-%FULLDISAGGREGATION takes in a data set an GLR parameters and
-%disaggregates on the data set.
+%% This function is ONLY to produce Confusion Matrix. Will work only for STATIC DATA. 
+% FULLDISAGGREGATION takes in a data set an GLR parameters and
+% disaggregates on the data set.
 %   data ==> should be a 1 x N or N x 1 vector of data.
 %   parameters ==> MUST be a 1 x N vector consisting of the following
 %       [w_BeforeAfterLength, w_GLRLength, v_Threshold, SignalNoiseRatio

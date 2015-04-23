@@ -1,12 +1,16 @@
+%% GENERATE THE ACCURACY METRICS for ON Events based on ON features
 load test1Day.mat
+
 %% Get events from aggregate data
 [onEventsAgg, offEventsAgg, allEventsAgg] = GLR_EventDetection(agg, 80,15,10,-20,1,0,4);
+
 %% Get events from submetered data
 [onEventsRef, offEventsRef, allEventsRef] = GLR_EventDetection(refrigerator, 80,15,10,-20,1,0,4);
 [onEventsHot, offEventsHot, allEventsHot] = GLR_EventDetection(hotbox, 80,15,10,-20,1,0,4);
 %[onEventsH10P, offEventsH10P, allEventsH10P] = GLR_EventDetection(h10p, 80,15,10,-20,1,0,4);
 [onEventsHVAC1, offEventsHVAC1, allEventsHVAC1] = GLR_EventDetection(HVAC1, 80,15,10,-20,1,0,4);
 [onEventsHVAC2, offEventsHVAC2, allEventsHVAC2] = GLR_EventDetection(HVAC2, 80,15,10,-20,1,0,4);
+
 %% Preliminary visual comparisons of TRUE ON values vs Detected ON Events
 figure(3)
 hold on
@@ -68,6 +72,7 @@ plot(onEventsHVAC2,'r')
 xlabel('Time of day (s)')
 title('Submetered HVAC2 ON events detected')
 hold off
+
 
 %% Create TRUTH vector of DCSID
 onEventsAgg1 = onEventsAgg;
@@ -175,12 +180,13 @@ hold off
 
 %% Disaggregate and get dcsIDs
 [ ONdcsID, OFFdcsID, TOTdcsID, MaxChebDistance, MeanChebDistance, MaxDistance, MeanDistance ] = FullDisaggregation( agg, onEventsAgg, offEventsAgg, allEventsAgg );
+
 %% Create guess dcsID vector
 guessOnDCSID = ONdcsID;
 % Remove non-events
 guessOnDCSID(onEventsAgg == 0) = [];
 
-% Visualise results
+%% Visualise results
 figure(8)
 subplot(3,1,2)
 plot(guessOnDCSID,'b')
@@ -281,7 +287,7 @@ title('Max Chebyshev Distance')
 xlabel('ON event index')
 ylabel('Distance')
 
-% Confusion Matrix
+%% Generate Confusion Matrix
 truthOn = prtDataSetClass;
 truthOn.targets = truthOnDCSID';
 truthOn.data = truthOnDCSID';

@@ -1,18 +1,24 @@
-function DisaggregationOutput2()
-%DISAGGREGATIONOUTPUT2 Summary of this function goes here
+function disaggTimeSeries()
+%disaggTimeSeries Summary of this function goes here
 %   Detailed explanation goes here
 
 if(~exist('DisaggregatedPower.csv', 'file'))
     %% Make Initial CSV File:
     csvwrite('DisaggregatedPower.csv', []);
-    
-    %% Get the first time vector
-    firstTimeData = importdata('eventData.csv');
-    [numRows, ~] = size(firstTimeData);
     functionPointers = [0, 0, 0, 0];
     memoryOfPreviousPowerValues = [0, 0, 0, 0, 0];
+else
+    memoryOfPreviousPowerValues = importdata('DisaggregatedPower.csv');
+    [rowsDisaggregatedPower, ~] = size(memoryOfPreviousPowerValues);
+    memoryOfPreviousPowerValues = memoryOfPreviousPowerValues(rowsDisaggregatedPower, :);
+    functionPointers = ones(1,4);
+    functionPointers(find(memoryOfPreviousPowerValues(2:5) > 0)) = 1;
+end
     
-    for i = 1:numRows
+    firstTimeData = importdata('eventData.csv');
+    [numRows, ~] = size(firstTimeData);
+    
+    for i = 2:numRows
         % Assume that the functionPointers are [0, 0, 0, 0] ==> all appliances
         % are off:
         
@@ -32,7 +38,7 @@ if(~exist('DisaggregatedPower.csv', 'file'))
         
         if(applianceNumber == 0)
             memoryOfPreviousPowerValues(1) = currentTime;
-            dlmwrite('DisaggregatedPower.csv', memoryOfPreviousPowerValues, '-append', 'newline', 'pc');
+            dlmwrite('DisaggregatedPower.csv', memoryOfPreviousPowerValues, '-append', 'newline', 'pc','precision',11);
         else
             [appliancePowerOutputs, functionPointers] = DisaggregationOutput(currentTime, disagMatrix, functionPointers);
             
@@ -40,21 +46,15 @@ if(~exist('DisaggregatedPower.csv', 'file'))
             memoryOfPreviousPowerValues(1) = appliancePowerOutputs(1);
             
             %% CSV Write:
-            dlmwrite('DisaggregatedPower.csv', memoryOfPreviousPowerValues, '-append', 'newline', 'pc');
+            dlmwrite('DisaggregatedPower.csv', memoryOfPreviousPowerValues, '-append', 'newline', 'pc','precision',11);
         end
     end
     
-    %% Continuous Stream:
-    %     disaggregatedData = importdata('DisaggregatedPower.csv');
-    %     [numRowsDisaggregatedPower, ~] = size(disaggregatedData);
-    %     appliancePowers = disaggregatedData(numRowsDisaggregatedPower, :);
-    %     appliancePowers = appliancePowers(2:length(appliancePowers));
-    %     functionPointers(appliancePowers ~= 0) = 1;
-    %     pause(1)
     
-    % memoryOfPreviousPowerValues = importData('DisaggregatedPower.csv');
-    % [rowsDisaggregatedPower, ~] = size(memoryOfPreviousPowerValues);
-    % memoryOfPreviousPowerValues = memoryOfPreviousPowerValues(numRows, :);
+    memoryOfPreviousPowerValues = importdata('DisaggregatedPower.csv');
+    [rowsDisaggregatedPower, ~] = size(memoryOfPreviousPowerValues);
+    memoryOfPreviousPowerValues = memoryOfPreviousPowerValues(rowsDisaggregatedPower, :);
+    numRows = rowsDisaggregatedPower;
     
     while(1)
         liveData = importdata('eventData.csv');
@@ -74,15 +74,10 @@ if(~exist('DisaggregatedPower.csv', 'file'))
                 memoryOfPreviousPowerValues(applianceNumber+ 1) = appliancePowerOutputs(applianceNumber+1);
                 memoryOfPreviousPowerValues(1) = appliancePowerOutputs(1);
                 
-                dlmwrite('DisaggregatedPower.csv', memoryOfPreviousPowerValues, '-append', 'newline', 'pc');
+                dlmwrite('DisaggregatedPower.csv', memoryOfPreviousPowerValues, '-append', 'newline', 'pc','precision',11);
             end
         end
         %% CSV Write:
         pause(1)
     end
-else
-    
 end
-
-end
-

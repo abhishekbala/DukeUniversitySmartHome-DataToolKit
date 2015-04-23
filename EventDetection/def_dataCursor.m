@@ -1,4 +1,7 @@
 function output_txt = myfunction(obj,event_obj)
+%% A function to change the number of significant figures shown on the
+% MATLAB plot tooltop -------------------------------------------------
+
 % Display the position of the data cursor
 % obj          Currently not used (empty)
 % event_obj    Handle to event object

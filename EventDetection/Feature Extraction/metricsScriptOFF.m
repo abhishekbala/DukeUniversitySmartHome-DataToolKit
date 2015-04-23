@@ -1,12 +1,16 @@
+%% GENERATE ACCURACY METRICS for OFF events based on OFF FEATURES
 load test1Day.mat
+
 %% Get events from aggregate data
 [onEventsAgg, offEventsAgg, allEventsAgg] = GLR_EventDetection(agg, 80,15,10,-20,1,0,4);
+
 %% Get events from submetered data
 [onEventsRef, offEventsRef, allEventsRef] = GLR_EventDetection(refrigerator, 80,15,10,-20,1,0,4);
 [onEventsHot, offEventsHot, allEventsHot] = GLR_EventDetection(hotbox, 80,15,10,-20,1,0,4);
 %[onEventsH10P, offEventsH10P, allEventsH10P] = GLR_EventDetection(h10p, 80,15,10,-20,1,0,4);
 [onEventsHVAC1, offEventsHVAC1, allEventsHVAC1] = GLR_EventDetection(HVAC1, 80,15,10,-20,1,0,4);
 [onEventsHVAC2, offEventsHVAC2, allEventsHVAC2] = GLR_EventDetection(HVAC2, 80,15,10,-20,1,0,4);
+
 %% Preliminary visual comparisons of TRUE ON values vs Detected ON Events
 figure(3)
 hold on
@@ -32,6 +36,7 @@ xlabel('Time of day (s)')
 title('Submetered Hot Box OFF events detected')
 hold off
 
+% H10p removed from top appliances
 % figure(5)
 % hold on
 % subplot(2,1,1)
@@ -106,6 +111,7 @@ subplot(2,1,1)
 hold on
 plot(offEventsAgg2,'b')
 
+% H10p removed from Top Appliances
 % onEventsAgg3 = onEventsAgg2;
 % for i = 31:length(onEventsAgg3)-30;
 %     if and(onEventsH10P(1,i) == 1,onEventsAgg3(1,i) == 1);
@@ -155,8 +161,6 @@ for i = 31:length(offEventsAgg5)-30;
     end
 end
 
-
-
 figure(7)
 subplot(2,1,1)
 hold on
@@ -184,12 +188,13 @@ hold off
 
 %% Disaggregate and get dcsIDs
 [ ONdcsID, OFFdcsID, TOTdcsID, MaxDistanceON, MaxDistanceOFF, MeanDistanceON, MeanDistanceOFF ] = FullDisaggregation( agg, onEventsAgg, offEventsAgg, allEventsAgg );
+
 %% Create guess dcsID vector
 guessOFFDCSID = OFFdcsID;
 % Remove non-events
 guessOFFDCSID(offEventsAgg == 0) = [];
 
-% Visualise results
+%% Visualise results
 figure(8)
 subplot(3,1,2)
 plot(guessOFFDCSID,'b')
@@ -249,7 +254,7 @@ title('Max Euclidian Distance')
 xlabel('OFF event index')
 ylabel('Distance')
 
-% Confusion Matrix
+%% Generate Confusion Matrix
 truthOff = prtDataSetClass;
 truthOff.targets = truthOffDCSID';
 truthOff.data = truthOffDCSID';

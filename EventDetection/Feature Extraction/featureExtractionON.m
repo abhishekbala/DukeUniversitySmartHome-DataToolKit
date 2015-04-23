@@ -1,7 +1,7 @@
-%% PCA Training
+%% Extract ON and OFF features
 load '..\kApplianceFeaturesAndSmartHomeData\smartHomeData.mat'
 
-% Power data for the different appliances
+%% Power data for the different appliances
 refrigerator = [fridgeData1; fridgeData2; fridgeData3; fridgeData4; fridgeData5; fridgeData6];
 clear fridgeData1 fridgeData2 fridgeData3 fridgeData4 fridgeData5 fridgeData6
 hotbox = [hotBoxData1; hotBoxData2; hotBoxData3; hotBoxData4];
@@ -12,7 +12,7 @@ HVAC2 = [HVAC2Data1; HVAC2Data2; HVAC2Data3; HVAC2Data4; HVAC2Data5; HVAC2Data6;
 clear HVAC2Data1 HVAC2Data2 HVAC2Data3 HVAC2Data4 HVAC2Data5 HVAC2Data6 HVAC2Data7 HVAC2Data8
 clear h10pData1 h10pData2 h10pData3 h10pData4
 
-% Event detection
+%% Event detection (Run ONCE)
 % [onEventsRef, offEventsRef, allEventsRef] = GLR_EventDetection(refrigerator, 40, 30, 25, -10, 3, 0, 6);
 % onEventsRef(1,59831) = 0; onEventsRef(1,64444) = 0; onEventsRef(1,139059) = 0; onEventsRef(1,142925) = 0;
 % offEventsRef(1,56310) = 0; offEventsRef(1,60039) = 0; offEventsRef(1,64657) = 0; offEventsRef(1,75364) = 0; offEventsRef(1,139260) = 0;
@@ -31,7 +31,7 @@ load '..\Two Features\hvac2Events.mat'
 
 clear allEventsRef allEventsHot allEventsHVAC1 allEventsHVAC2
 
-% Refrigerator
+%% Refrigerator Features
 [onMatrix, offMatrix] = pcaTraining(refrigerator,onEventsRef,offEventsRef);
 onFeaturesMatrix = [];
 offFeaturesMatrix = [];
@@ -72,8 +72,7 @@ for i = 1:p
     [offDelta] = [offDelta; eventDelta];
 end
 
-
-% HotBox
+%% HotBox Features
 [onMatrix, offMatrix] = pcaTraining(hotbox,onEventsHot,offEventsHot);
 onFeaturesMatrix = [onFeaturesMatrix; onMatrix];
 offFeaturesMatrix = [offFeaturesMatrix; offMatrix];
@@ -98,8 +97,7 @@ for i = 1:p
     [offDelta] = [offDelta; eventDelta];
 end
 
-
-%HVAC1
+%% HVAC1 Features
 [onMatrix, offMatrix] = pcaTraining(HVAC1,onEventsHVAC1,offEventsHVAC1);
 onFeaturesMatrix = [onFeaturesMatrix; onMatrix];
 offFeaturesMatrix = [offFeaturesMatrix; offMatrix];
@@ -125,7 +123,7 @@ for i = 1:p
 end
 
 
-%HVAC2
+%% HVAC2 Features
 [onMatrix, offMatrix] = pcaTraining(HVAC2,onEventsHVAC2,offEventsHVAC2);
 onFeaturesMatrix = [onFeaturesMatrix; onMatrix];
 offFeaturesMatrix = [offFeaturesMatrix; offMatrix];
@@ -150,6 +148,7 @@ for i = 1:p
     [offDelta] = [offDelta; eventDelta];
 end
 
+%% Not using PCA features
 %onFeatureSetPCA = prtDataSetClass;
 %offFeatureSetPCA = prtDataSetClass;
 
@@ -169,9 +168,12 @@ end
 %pcaOFFeatures = pcaOFF.run(offFeatureSetPCA);
 %plot(pcaOFFeatures)
 
+%% Collect all features together into prtDataClass
 onFeatures = prtDataSetClass;
 onFeatures.data = [onSlope onDelta];
 onFeatures.targets = onTargets;
+% Create HVAC Mode 1 and HVAC Mode 2 features by labelling all feature
+% points above 1E4 for Feature 2 as 5 (HVAC Mode 2)
 onFeatures.targets(onFeatures.data(:,2) > 1e4) = 5;
 onFeatures.targets(onFeatures.targets(:,1) == 4) = 3;
 onFeatures.targets(onFeatures.targets(:,1) == 5) = 4;
@@ -182,6 +184,8 @@ plot(onFeatures)
 offFeatures = prtDataSetClass;
 offFeatures.data = [offSlope offDelta];
 offFeatures.targets = offTargets;
+% Create HVAC Mode 1 and HVAC Mode 2 features by labelling all feature
+% points above 1E4 for Feature 2 as 5 (HVAC Mode 2)
 offFeatures.targets(offFeatures.data(:,2) > 1e4) = 5;
 offFeatures.targets(offFeatures.targets(:,1) == 4) = 3;
 offFeatures.targets(offFeatures.targets(:,1) == 5) = 4;
